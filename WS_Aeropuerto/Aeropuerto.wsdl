@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:tns="http://Aeropuerto"
+  xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+  targetNamespace="http://Aeropuerto">
+  <wsdl:documentation>
+    Service: Servicio Aeropuerto
+    Version: 1.0
+    Owner: AST C3.
+  </wsdl:documentation>
+  <!-- Types element: -->
+  <wsdl:types>
+    <xsd:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://Aeropuerto">
+      <!-- Obtener la informacion del aeropuerto de origen -->
+      <xsd:element name="getInfoAeropuertoOrigen">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="ciudadOrigen" nillable="true" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getInfoAeropuertoOrigenResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="infoAeropuertoOrigen" nillable="true" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <!-- END getInfoAeropuertoOrigen -->
+      <!-- Obtener la informacion del aeropuerto de destino -->
+      <xsd:element name="getInfoAeropuertoDestino">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="ciudadDestino" nillable="true" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getInfoAeropuertoDestinoResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="infoAeropuertoDestino" nillable="true" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    <!-- END getInfoAeropuertoDestino -->
+    </xsd:schema>
+  </wsdl:types>
+  <!-- END Types element: -->
+  <!-- Message element: -->
+  <!-- input message of getInfoAeropuertoOrigen -->
+  <wsdl:message name="getInfoAeropuertoOrigenSoapIn">
+    <wsdl:part name="parameters" element="tns:getInfoAeropuertoOrigen"/>
+  </wsdl:message>
+  <!-- output message of getInfoAeropuertoOrigen -->
+  <wsdl:message name="getInfoAeropuertoOrigenSoapOut">
+    <wsdl:part name="parameters" element="tns:getInfoAeropuertoOrigenResponse"/>
+  </wsdl:message>
+  <!-- input message of getInfoAeropuertoDestino -->
+  <wsdl:message name="getInfoAeropuertoDestinoSoapIn">
+    <wsdl:part name="parameters" element="tns:getInfoAeropuertoDestino"/>
+  </wsdl:message>
+  <!-- output message of getInfoAeropuertoOrigen -->
+  <wsdl:message name="getInfoAeropuertoDestinoSoapOut">
+    <wsdl:part name="parameters" element="tns:getInfoAeropuertoDestinoResponse"/>
+  </wsdl:message>
+  <!-- END Message element: -->
+  <!-- portType element: -->
+  <wsdl:portType name="AeropuertoPortType">
+    <wsdl:documentation>Description of the business interface</wsdl:documentation>
+    <!-- operation of getInfoAeropuertoOrigen -->
+    <wsdl:operation name="getInfoAeropuertoOrigenOperation">
+      <wsdl:input message="tns:getInfoAeropuertoOrigenSoapIn" wsaw:Action="urn:getInfoAeropuertoOrigen"/>
+      <wsdl:output message="tns:getInfoAeropuertoOrigenSoapOut" wsaw:Action="urn:getInfoAeropuertoOrigenResponse"/>
+    </wsdl:operation>
+    <!-- operation of getInfoAeropuertoDestino -->
+    <wsdl:operation name="getInfoAeropuertoDestinoOperation">
+      <wsdl:input message="tns:getInfoAeropuertoDestinoSoapIn" wsaw:Action="urn:getInfoAeropuertoDestino"/>
+      <wsdl:output message="tns:getInfoAeropuertoDestinoSoapOut" wsaw:Action="urn:getInfoAeropuertoDestinoResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <!-- END portType element: -->
+  <!-- binding elements -->
+  <wsdl:binding name="AeropuertoSoap11Binding" type="tns:AeropuertoPortType">
+      <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+      <wsdl:operation name="getInfoAeropuertoOrigenOperation">
+          <soap:operation soapAction="urn:getInfoAeropuertoOrigenOperation" style="document"/>
+          <wsdl:input>
+              <soap:body use="literal"/>
+          </wsdl:input>
+          <wsdl:output>
+              <soap:body use="literal"/>
+          </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getInfoAeropuertoDestinoOperation">
+          <soap:operation soapAction="urn:getInfoAeropuertoDestinoOperation" style="document"/>
+          <wsdl:input>
+              <soap:body use="literal"/>
+          </wsdl:input>
+          <wsdl:output>
+              <soap:body use="literal"/>
+          </wsdl:output>
+      </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="AeropuertoSoap12Binding" type="tns:AeropuertoPortType">
+      <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+      <wsdl:operation name="getInfoAeropuertoOrigenOperation">
+          <soap12:operation soapAction="urn:getInfoAeropuertoOrigenOperation" style="document"/>
+          <wsdl:input>
+              <soap12:body use="literal"/>
+          </wsdl:input>
+          <wsdl:output>
+              <soap12:body use="literal"/>
+          </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getInfoAeropuertoDestinoOperation">
+          <soap12:operation soapAction="urn:getInfoAeropuertoDestinoOperation" style="document"/>
+          <wsdl:input>
+              <soap12:body use="literal"/>
+          </wsdl:input>
+          <wsdl:output>
+              <soap12:body use="literal"/>
+          </wsdl:output>
+      </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="AeropuertoHttpBinding" type="tns:AeropuertoPortType">
+      <http:binding verb="POST"/>
+      <wsdl:operation name="getInfoAeropuertoOrigenOperation">
+          <http:operation location="getInfoAeropuertoOrigenOperation"/>
+          <wsdl:input>
+              <mime:content type="application/xml" part="parameters"/>
+          </wsdl:input>
+          <wsdl:output>
+              <mime:content type="application/xml" part="parameters"/>
+          </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getInfoAeropuertoDestinoOperation">
+          <http:operation location="getInfoAeropuertoDestinoOperation"/>
+          <wsdl:input>
+              <mime:content type="application/xml" part="parameters"/>
+          </wsdl:input>
+          <wsdl:output>
+              <mime:content type="application/xml" part="parameters"/>
+          </wsdl:output>
+      </wsdl:operation>
+  </wsdl:binding>
+  <!-- END binding elements -->
+  <!-- service element -->
+  <wsdl:service name="Aeropuerto">
+      <wsdl:port name="AeropuertoHttpSoap11Endpoint" binding="tns:AeropuertoSoap11Binding">
+          <soap:address location="http://localhost:8080/axis2/services/Aeropuerto"/>
+      </wsdl:port>
+      <wsdl:port name="AeropuertoHttpSoap12Endpoint" binding="tns:AeropuertoSoap12Binding">
+          <soap12:address location="http://localhost:8080/axis2/services/Aeropuerto"/>
+      </wsdl:port>
+      <wsdl:port name="AeropuertoHttpEndpoint" binding="tns:AeropuertoHttpBinding">
+          <http:address location="http://localhost:8080/axis2/services/Aeropuerto"/>
+      </wsdl:port>
+  </wsdl:service>
+  <!-- END service element -->
+</wsdl:definitions>
