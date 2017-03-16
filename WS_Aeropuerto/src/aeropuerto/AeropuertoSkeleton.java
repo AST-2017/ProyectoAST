@@ -6,8 +6,6 @@
  */
 package aeropuerto;
 
-
-//iahsdsanzd
 public class AeropuertoSkeleton {
     /**
      * getInfoAeropuertoDestinoOperation
