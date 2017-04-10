@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://Vuelos" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://Vuelos" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://Vuelos">
+            <xs:element name="getInfoVuelos">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="1" name="originAirport" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="1" name="destinationAirport" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="1" name="outboundDate" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="1" name="inboundDate" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInfoVuelosResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" name="vuelos" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getInfoVuelosResponse">
+    <wsdl:part name="parameters" element="ns:getInfoVuelosResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getInfoVuelosRequest">
+    <wsdl:part name="parameters" element="ns:getInfoVuelos">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="VuelosPortType">
+    <wsdl:operation name="getInfoVuelos">
+      <wsdl:input message="ns:getInfoVuelosRequest" wsaw:Action="urn:getInfoVuelos">
+    </wsdl:input>
+      <wsdl:output message="ns:getInfoVuelosResponse" wsaw:Action="urn:getInfoVuelosResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="VuelosSoap11Binding" type="ns:VuelosPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getInfoVuelos">
+      <soap:operation soapAction="urn:getInfoVuelos" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="VuelosSoap12Binding" type="ns:VuelosPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getInfoVuelos">
+      <soap12:operation soapAction="urn:getInfoVuelos" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="VuelosHttpBinding" type="ns:VuelosPortType">
+    <http:binding verb="POST"/>
+    <wsdl:operation name="getInfoVuelos">
+      <http:operation location="getInfoVuelos"/>
+      <wsdl:input>
+        <mime:content part="parameters" type="application/xml"/>
+      </wsdl:input>
+      <wsdl:output>
+        <mime:content part="parameters" type="application/xml"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Vuelos">
+    <wsdl:port name="VuelosHttpSoap11Endpoint" binding="ns:VuelosSoap11Binding">
+      <soap:address location="http://localhost:8080/axis2/services/Vuelos"/>
+    </wsdl:port>
+    <wsdl:port name="VuelosHttpSoap12Endpoint" binding="ns:VuelosSoap12Binding">
+      <soap12:address location="http://localhost:8080/axis2/services/Vuelos"/>
+    </wsdl:port>
+    <wsdl:port name="VuelosHttpEndpoint" binding="ns:VuelosHttpBinding">
+      <http:address location="http://localhost:8080/axis2/services/Vuelos"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
