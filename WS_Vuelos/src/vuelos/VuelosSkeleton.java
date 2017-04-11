@@ -15,9 +15,9 @@ import java.util.ArrayList;
 
 /**
  * VuelosSkeleton java skeleton for the axisService
- *
+ * <p>
  * Funcionalidad:
- *
+ * <p>
  * Cuando el cliente realiza una peticion, el Orquestador,
  * llamara al servicio web Vuelos, pasandole el aeropuerto
  * de origen, el aeropuerto de destino, la fecha de salida y
@@ -32,21 +32,21 @@ import java.util.ArrayList;
 
 /**
  * Tratamiento de errores:
- *
+ * <p>
  * Los errores, ya sea por algun parámetro incorrecto, por
  * problemas de SkyScanner o porque no hay vuelos Destino-Origen
  * para las fechas seleccionadas, se les notificara al Cliente, por
  * medio también de un mensaje JSON de la forma:
- *
+ * <p>
  * Ejemplo:
- *
+ * <p>
  * {
- *  "ValidationErrors":
- *  [
- *      {
- *          "Message": "Rate limit has been exceeded: 0 PerMinute for PricingSession"
- *      }
- *  ]
+ * "ValidationErrors":
+ * [
+ * {
+ * "Message": "Rate limit has been exceeded: 0 PerMinute for PricingSession"
+ * }
+ * ]
  * }
  */
 
@@ -56,59 +56,31 @@ public class VuelosSkeleton {
     private static ArrayList<SalidasRegresos> salidasRegresosArrayList = new ArrayList<>();
 
     /**
-     * Metodo getInfoVuelos:
-     * llama al metodo getResponseSkyScanner que devuelve
-     * la consulta en formato JSON, se alamcena en la etiqueta
-     * <vuelos></vuelos> del mensaje SOAP de respuesta.
-     *
-     * @param getInfoVuelos
-     * @return getInfoVuelosResponse
-     */
-    public vuelos.GetInfoVuelosResponse getInfoVuelos(vuelos.GetInfoVuelos getInfoVuelos) throws IOException, JSONException {
-        GetInfoVuelosResponse getInfoVuelosResponse = new GetInfoVuelosResponse();
-        String originAirport = getInfoVuelos.getOriginAirport();
-        String destinationAirport = getInfoVuelos.getDestinationAirport();
-        String outboundDate = getInfoVuelos.getOutboundDate();
-        String inboundDate = getInfoVuelos.getInboundDate();
-        String responseClient;
-
-        String responseSkyScanner = getResponseSkyScanner(originAirport,destinationAirport, outboundDate,inboundDate);
-
-        JSONObject object = new JSONObject(responseSkyScanner);
-        if (object.has("ValidationErrors")) responseClient = responseSkyScanner;
-        else responseClient = creteJSON(responseSkyScanner);
-
-        getInfoVuelosResponse.setVuelos(responseClient);
-
-        return getInfoVuelosResponse;
-    }
-
-    /**
      * Este metodo, contacta con el servicio de SkyScanner,
      * obteniendo los resultados en base a los siguientes
      * parametros:
      *
-     * @param originAirport aeropuerto de origen.
+     * @param originAirport      aeropuerto de origen.
      * @param destinationAirport aeropuerto de destino.
-     * @param outboundDate fecha de salida.
-     * @param inboundDate fecha de regreso.
+     * @param outboundDate       fecha de salida.
+     * @param inboundDate        fecha de regreso.
      * @return respuesta de la consulta en formato JSON.
      * @throws IOException para posibles errores con la consulta al servicio REST.
      */
     public static String getResponseSkyScanner(String originAirport, String destinationAirport, String outboundDate,
-                                               String inboundDate) throws IOException{
+                                               String inboundDate) throws IOException {
         String response = "";
         String request = originAirport + "/" + destinationAirport + "/" + outboundDate + "/" + inboundDate;
         URL url = new URL("http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/ES/eur/es-ES/"
-                +request+"?apikey=prtl6749387986743898559646983194");
+                + request + "?apikey=prtl6749387986743898559646983194");
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        connection.setRequestProperty("Accept","application/json");
+        connection.setRequestProperty("Accept", "application/json");
 
-        if (connection.getResponseCode() != 200){
+        if (connection.getResponseCode() != 200) {
             response = "Failed : HTTP error code : " + connection.getResponseCode();
-        }else {
+        } else {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String aux;
             while ((aux = bufferedReader.readLine()) != null) response = response + aux;
@@ -122,21 +94,18 @@ public class VuelosSkeleton {
      * de SkyScanner y devuelve en fromato JSON, los datos necesarios
      * para la respuesta al cliente.
      *
-     * @implNote: si SkyScanner no devueve en la respuesta ninguna
-     * salida o ninguna llegada, solo tomaremos como valida la
-     * parte conjunta salidaEntrada.
-     *
-     * Formato de la respuesta JSON: la espuesta podrá contener
-     * un array de tres tipos distinots:
-     *
-     * "Salidas" con los atributos correspondientes a la clase Salidas.java
-     * "Regresos" con los atributos correspondientes a la clase Regresos.java
-     * "SalidasRegresos" con los atributos correspondientes a la clase SalidasRegresos.java
-     *
      * @param responseSkyScanner respuesta de SkyScanner.
      * @return respuesta al Orquestador en JSON.
      * @throws JSONException
      * @throws IOException
+     * @implNote: si SkyScanner no devueve en la respuesta ninguna
+     * salida o ninguna llegada, solo tomaremos como valida la
+     * parte conjunta salidaEntrada.
+     * <p>
+     * Formato de la respuesta JSON: la espuesta podrá contener
+     * un array del siguiente tipo:
+     * <p>
+     * "Ofertas" con los atributos correspondientes a la clase SalidasRegresos.java
      */
 
     public static String creteJSON(String responseSkyScanner) throws JSONException, IOException {
@@ -144,56 +113,60 @@ public class VuelosSkeleton {
         JSONArray array = object.getJSONArray("Quotes");
         for (int i = 0; i < array.length(); i++) {
             JSONObject object1 = array.getJSONObject(i);
-            if (object1.has("OutboundLeg") && object1.has("InboundLeg")){
-                salidasRegresos(object,object1);
-            }else {
-                if (object1.has("OutboundLeg")){
-                    salidas(object,object1);
-                }else {
-                    regresos(object,object1);
+            if (object1.has("OutboundLeg") && object1.has("InboundLeg")) {
+                salidasRegresos(object, object1);
+            } else {
+                if (object1.has("OutboundLeg")) {
+                    salidas(object, object1);
+                } else {
+                    regresos(object, object1);
                 }
             }
         }
+        if (!salidasArrayList.isEmpty() && !regresosArrayList.isEmpty()) {
+            for (int i = 0; i < salidasArrayList.size(); i++) {
+                for (int j = 0; j < regresosArrayList.size(); j++) {
+                    SalidasRegresos salidasRegresos = new SalidasRegresos(
+                            salidasArrayList.get(i).getPrecio() + regresosArrayList.get(j).getPrecio(),
+                            salidasArrayList.get(i).getVueloDirecto(),
+                            regresosArrayList.get(j).getVueloDirecto(),
+                            salidasArrayList.get(i).getFecha(),
+                            regresosArrayList.get(j).getFecha(),
+                            salidasArrayList.get(i).getOrigen(),
+                            salidasArrayList.get(i).getDestino(),
+                            regresosArrayList.get(j).getOrigen(),
+                            regresosArrayList.get(j).getDestino(),
+                            salidasArrayList.get(i).getIataCodeOrigen(),
+                            salidasArrayList.get(i).getIataCodeDestino(),
+                            regresosArrayList.get(j).getIataCodeOrigen(),
+                            regresosArrayList.get(j).getIataCodeDestino(),
+                            salidasArrayList.get(i).getAerolinea(),
+                            regresosArrayList.get(j).getAerolinea()
+                    );
+                    salidasRegresosArrayList.add(salidasRegresos);
+                }
+            }
+        }
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
-        String json = "";
-        if (salidasArrayList.size() > 0 && regresosArrayList.size() > 0) {
-            json = "{\n\"Salidas\": [";
-            for (int i = 0; i < salidasArrayList.size(); i++) {
-                json = json + "\n" + mapper.writeValueAsString(salidasArrayList.get(i));
-                if (i < salidasArrayList.size() - 1) json = json + ",";
-            }
-            json = json + "]," + "\n\"Regresos\": [";
-            for (int i = 0; i < regresosArrayList.size(); i++) {
-                json = json + "\n" + mapper.writeValueAsString(regresosArrayList.get(i));
-                if (i < regresosArrayList.size() - 1) json = json + ",";
-            }
-            json = json + "]," + "\n\"SalidasRegresos\": [";
+        String json;
+        if (salidasRegresosArrayList.size() > 0) {
+            json = "{\n\"Ofertas\": [";
             for (int i = 0; i < salidasRegresosArrayList.size(); i++) {
                 json = json + "\n" + mapper.writeValueAsString(salidasRegresosArrayList.get(i));
                 if (i < salidasRegresosArrayList.size() - 1) json = json + ",";
             }
             json = json + "]\n}";
-        }else{
-            if (salidasRegresosArrayList.size() > 0){
-                json = "{\n\"SalidasRegresos\": [";
-                for (int i = 0; i < salidasRegresosArrayList.size(); i++) {
-                    json = json + "\n" + mapper.writeValueAsString(salidasRegresosArrayList.get(i));
-                    if (i < salidasRegresosArrayList.size() - 1) json = json + ",";
-                }
-                json = json + "]\n}";
-
-            }else {
-                json = "{\n" +
-                        "  \"ValidationErrors\": [\n" +
-                        "    {\n" +
-                        "      \"Message\": \"No hay vuelos disponibles en esa fecha para los destinos seleccionados\"\n" +
-                        "    }\n" +
-                        "  ]\n" +
-                        "}";
-            }
+        } else {
+            json = "{\n" +
+                    "  \"ValidationErrors\": [\n" +
+                    "    {\n" +
+                    "      \"Message\": \"No hay vuelos disponibles en esa fecha para los destinos seleccionados\"\n" +
+                    "    }\n" +
+                    "  ]\n" +
+                    "}";
         }
-
         salidasArrayList.clear();
         regresosArrayList.clear();
         salidasRegresosArrayList.clear();
@@ -207,7 +180,7 @@ public class VuelosSkeleton {
      * formato JSON con los atributos que son necesarios.
      *
      * @param object la respuesta JSON completa.
-     * @param quote la parte de presupuestos de la respuesta JSON
+     * @param quote  la parte de presupuestos de la respuesta JSON
      * @throws JSONException
      */
 
@@ -223,17 +196,17 @@ public class VuelosSkeleton {
         int idDestino = outboundObject.getInt("DestinationId");
         String fecha = outboundObject.getString("DepartureDate");
 
-        String[] infociudadOrigen = getInfoCiudad(object,idOrigen);
+        String[] infociudadOrigen = getInfoCiudad(object, idOrigen);
         String origen = infociudadOrigen[0];
         String iataCodeOrigen = infociudadOrigen[1];
 
-        String[] infociudadDestino = getInfoCiudad(object,idDestino);
+        String[] infociudadDestino = getInfoCiudad(object, idDestino);
         String destino = infociudadDestino[0];
         String iataCodeDestino = infociudadDestino[1];
 
         for (int i = 0; i < idsAerolinea.length; i++) {
-            String aerolinea = getCarrier(object,idsAerolinea[i]);
-            Salidas salidas = new Salidas(precio,directo,fecha,origen,destino,iataCodeOrigen,iataCodeDestino,aerolinea);
+            String aerolinea = getCarrier(object, idsAerolinea[i]);
+            Salidas salidas = new Salidas(precio, directo, fecha, origen, destino, iataCodeOrigen, iataCodeDestino, aerolinea);
             salidasArrayList.add(salidas);
         }
     }
@@ -244,7 +217,7 @@ public class VuelosSkeleton {
      * formato JSON con los atributos que son necesarios.
      *
      * @param object la respuesta JSON completa.
-     * @param quote la parte de presupuestos de la respuesta JSON
+     * @param quote  la parte de presupuestos de la respuesta JSON
      * @throws JSONException
      */
 
@@ -260,17 +233,17 @@ public class VuelosSkeleton {
         int idDestino = inboundObject.getInt("DestinationId");
         String fecha = inboundObject.getString("DepartureDate");
 
-        String[] infociudadOrigen = getInfoCiudad(object,idOrigen);
+        String[] infociudadOrigen = getInfoCiudad(object, idOrigen);
         String origen = infociudadOrigen[0];
         String iataCodeOrigen = infociudadOrigen[1];
 
-        String[] infociudadDestino = getInfoCiudad(object,idDestino);
+        String[] infociudadDestino = getInfoCiudad(object, idDestino);
         String destino = infociudadDestino[0];
         String iataCodeDestino = infociudadDestino[1];
 
         for (int i = 0; i < idsAerolinea.length; i++) {
-            String aerolinea = getCarrier(object,idsAerolinea[i]);
-            Regresos regresos = new Regresos(precio,directo,fecha,origen,destino,iataCodeOrigen,iataCodeDestino,aerolinea);
+            String aerolinea = getCarrier(object, idsAerolinea[i]);
+            Regresos regresos = new Regresos(precio, directo, fecha, origen, destino, iataCodeOrigen, iataCodeDestino, aerolinea);
             regresosArrayList.add(regresos);
         }
     }
@@ -281,7 +254,7 @@ public class VuelosSkeleton {
      * formato JSON con los atributos que son necesarios.
      *
      * @param object la respuesta JSON completa.
-     * @param quote la parte de presupuestos de la respuesta JSON
+     * @param quote  la parte de presupuestos de la respuesta JSON
      * @throws JSONException
      */
 
@@ -306,31 +279,31 @@ public class VuelosSkeleton {
         String fechaRegreso = inboundObject.getString("DepartureDate");
 
 
-        String[] infociudadOrigenSalida = getInfoCiudad(object,idOrigenSalida);
+        String[] infociudadOrigenSalida = getInfoCiudad(object, idOrigenSalida);
         String origenSalida = infociudadOrigenSalida[0];
         String iataCodeOrigenSalida = infociudadOrigenSalida[1];
 
-        String[] infociudadDestinoSalida = getInfoCiudad(object,idDestinoSalida);
+        String[] infociudadDestinoSalida = getInfoCiudad(object, idDestinoSalida);
         String destinoSalida = infociudadDestinoSalida[0];
         String iataCodeDestinoSalida = infociudadDestinoSalida[1];
 
         String[] aerolineasSalida = new String[idsAerolineaSalida.length];
         for (int i = 0; i < idsAerolineaSalida.length; i++) {
-             aerolineasSalida[i] = getCarrier(object,idsAerolineaSalida[i]);
+            aerolineasSalida[i] = getCarrier(object, idsAerolineaSalida[i]);
         }
 
         String[] aerolinesRegreso = new String[idsAerolineaRegreso.length];
         for (int i = 0; i < idsAerolineaRegreso.length; i++) {
-            aerolinesRegreso[i] = getCarrier(object,idsAerolineaRegreso[i]);
+            aerolinesRegreso[i] = getCarrier(object, idsAerolineaRegreso[i]);
         }
 
         for (int i = 0; i < aerolineasSalida.length; i++) {
-            for (int j = 0; j < aerolinesRegreso.length ; j++) {
+            for (int j = 0; j < aerolinesRegreso.length; j++) {
                 String aerolineaSalida = aerolineasSalida[i];
                 String aerolineaRegreso = aerolinesRegreso[i];
-                SalidasRegresos salidasRegresos = new SalidasRegresos(precio,directo,fechaSalida,fechaRegreso,
-                        origenSalida,destinoSalida,destinoSalida,origenSalida,iataCodeOrigenSalida,
-                        iataCodeDestinoSalida,iataCodeDestinoSalida,iataCodeOrigenSalida,aerolineaSalida,
+                SalidasRegresos salidasRegresos = new SalidasRegresos(precio, directo, directo, fechaSalida, fechaRegreso,
+                        origenSalida, destinoSalida, destinoSalida, origenSalida, iataCodeOrigenSalida,
+                        iataCodeDestinoSalida, iataCodeDestinoSalida, iataCodeOrigenSalida, aerolineaSalida,
                         aerolineaRegreso);
                 salidasRegresosArrayList.add(salidasRegresos);
             }
@@ -341,16 +314,16 @@ public class VuelosSkeleton {
      * Método que devuelve un array de longitud 2, conteniendo el nombre
      * y codigo iata del aeropuerto de la ciudad pedida.
      *
-     * @param object necesario el documento JSON completo
+     * @param object   necesario el documento JSON completo
      * @param idCiudad identificador, para encontrar la ciudad y codigo iata.
      * @return(NombreCiudad,iataCode)
      */
-    public static String[] getInfoCiudad(JSONObject object,int idCiudad) throws JSONException {
+    public static String[] getInfoCiudad(JSONObject object, int idCiudad) throws JSONException {
         JSONArray array = object.getJSONArray("Places");
         String[] infociudad = new String[2];
         for (int i = 0; i < array.length(); i++) {
             JSONObject object1 = array.getJSONObject(i);
-            if (object1.getInt("PlaceId") == idCiudad){
+            if (object1.getInt("PlaceId") == idCiudad) {
                 infociudad[0] = object1.getString("CityName");
                 infociudad[1] = object1.getString("IataCode");
             }
@@ -363,7 +336,7 @@ public class VuelosSkeleton {
      * Método que devuelve un String con el nombre de la aerolinea
      * en funcin del carrierID dado.
      *
-     * @param object necesario el documento JSON completo
+     * @param object    necesario el documento JSON completo
      * @param carrierID identificador, para encontrar la aerolinea
      * @return(nombre aerolinea)
      */
@@ -379,6 +352,34 @@ public class VuelosSkeleton {
         }
 
         return aerolinea;
+    }
+
+    /**
+     * Metodo getInfoVuelos:
+     * llama al metodo getResponseSkyScanner que devuelve
+     * la consulta en formato JSON, se alamcena en la etiqueta
+     * <vuelos></vuelos> del mensaje SOAP de respuesta.
+     *
+     * @param getInfoVuelos
+     * @return getInfoVuelosResponse
+     */
+    public vuelos.GetInfoVuelosResponse getInfoVuelos(vuelos.GetInfoVuelos getInfoVuelos) throws IOException, JSONException {
+        GetInfoVuelosResponse getInfoVuelosResponse = new GetInfoVuelosResponse();
+        String originAirport = getInfoVuelos.getOriginAirport();
+        String destinationAirport = getInfoVuelos.getDestinationAirport();
+        String outboundDate = getInfoVuelos.getOutboundDate();
+        String inboundDate = getInfoVuelos.getInboundDate();
+        String responseClient;
+
+        String responseSkyScanner = getResponseSkyScanner(originAirport, destinationAirport, outboundDate, inboundDate);
+
+        JSONObject object = new JSONObject(responseSkyScanner);
+        if (object.has("ValidationErrors")) responseClient = responseSkyScanner;
+        else responseClient = creteJSON(responseSkyScanner);
+
+        getInfoVuelosResponse.setVuelos(responseClient);
+
+        return getInfoVuelosResponse;
     }
 
 }

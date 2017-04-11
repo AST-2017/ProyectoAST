@@ -2,7 +2,8 @@ package vuelos;
 
 public class SalidasRegresos {
     private int precio;
-    private boolean vueloDirecto;
+    private boolean vueloDirectoSalida;
+    private boolean vueloDirectoRegreso;
     private String fechaSalida;
     private String fechaRegreso;
     private String origenSalida;
@@ -16,12 +17,13 @@ public class SalidasRegresos {
     private String aerolineaSalida;
     private String aerolineaRegreso;
 
-    public SalidasRegresos(int precio,boolean vueloDirecto, String fechaSalida, String fechaRegreso,
-                           String origenSalida,String destinoSalida, String origenRegreso, String destinoRegreso,
+    public SalidasRegresos(int precio, boolean vueloDirectoSalida,boolean vueloDirectoRegreso, String fechaSalida, String fechaRegreso,
+                           String origenSalida, String destinoSalida, String origenRegreso, String destinoRegreso,
                            String iataCodeOrigenSalida, String iataCodeDestinoSalida, String iataCodeOrigenRegreso,
-                           String iataCodeDestinoRegreso,String aerolineaSalida, String aerolineaRegreso){
+                           String iataCodeDestinoRegreso, String aerolineaSalida, String aerolineaRegreso){
         this.precio = precio;
-        this.vueloDirecto = vueloDirecto;
+        this.vueloDirectoSalida = vueloDirectoSalida;
+        this.vueloDirectoRegreso = vueloDirectoRegreso;
         this.fechaSalida = fechaSalida;
         this.fechaRegreso = fechaRegreso;
         this.origenSalida = origenSalida;
@@ -44,12 +46,20 @@ public class SalidasRegresos {
         this.precio = precio;
     }
 
-    public boolean getVueloDirecto() {
-        return vueloDirecto;
+    public boolean getVueloDirectoSalida() {
+        return vueloDirectoSalida;
     }
 
-    public void setVueloDirecto(boolean vueloDirecto) {
-        this.vueloDirecto = vueloDirecto;
+    public void setVueloDirectoSalida(boolean vueloDirectoSalida) {
+        this.vueloDirectoSalida = vueloDirectoSalida;
+    }
+
+    public boolean getVueloDirectoRegreso() {
+        return vueloDirectoRegreso;
+    }
+
+    public void setVueloDirectoRegreso(boolean vueloDirectoRegreso) {
+        this.vueloDirectoRegreso = vueloDirectoRegreso;
     }
 
     public String getFechaSalida() {
