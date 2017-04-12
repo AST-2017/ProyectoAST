@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://Aeropuertos" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://Aeropuertos" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://Aeropuertos">
+            <xs:element name="getInfoAeropuerto">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="ciudadOrigen" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="ciudadDestino" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getInfoAeropuertoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="aeropuertos" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getInfoAeropuertoRequest">
+    <wsdl:part name="parameters" element="ns:getInfoAeropuerto">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getInfoAeropuertoResponse">
+    <wsdl:part name="parameters" element="ns:getInfoAeropuertoResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="AeropuertosPortType">
+    <wsdl:operation name="getInfoAeropuerto">
+      <wsdl:input message="ns:getInfoAeropuertoRequest" wsaw:Action="urn:getInfoAeropuerto">
+    </wsdl:input>
+      <wsdl:output message="ns:getInfoAeropuertoResponse" wsaw:Action="urn:getInfoAeropuertoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="AeropuertosHttpBinding" type="ns:AeropuertosPortType">
+    <http:binding verb="POST"/>
+    <wsdl:operation name="getInfoAeropuerto">
+      <http:operation location="getInfoAeropuerto"/>
+      <wsdl:input>
+        <mime:content part="parameters" type="application/xml"/>
+      </wsdl:input>
+      <wsdl:output>
+        <mime:content part="parameters" type="application/xml"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="AeropuertosSoap12Binding" type="ns:AeropuertosPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getInfoAeropuerto">
+      <soap12:operation soapAction="urn:getInfoAeropuerto" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="AeropuertosSoap11Binding" type="ns:AeropuertosPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getInfoAeropuerto">
+      <soap:operation soapAction="urn:getInfoAeropuerto" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Aeropuertos">
+    <wsdl:port name="AeropuertosHttpSoap12Endpoint" binding="ns:AeropuertosSoap12Binding">
+      <soap12:address location="http://localhost:8080/axis2/services/Aeropuertos"/>
+    </wsdl:port>
+    <wsdl:port name="AeropuertosHttpEndpoint" binding="ns:AeropuertosHttpBinding">
+      <http:address location="http://localhost:8080/axis2/services/Aeropuertos"/>
+    </wsdl:port>
+    <wsdl:port name="AeropuertosHttpSoap11Endpoint" binding="ns:AeropuertosSoap11Binding">
+      <soap:address location="http://localhost:8080/axis2/services/Aeropuertos"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
