@@ -1,5 +1,7 @@
 package vuelos;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jettison.json.JSONArray;
@@ -73,6 +75,7 @@ public class VuelosSkeleton {
         String request = originAirport + "/" + destinationAirport + "/" + outboundDate + "/" + inboundDate;
         URL url = new URL("http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/ES/eur/es-ES/"
                 + request + "?apikey=prtl6749387986743898559646983194");
+        Logger.getRootLogger().setLevel(Level.OFF);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -123,6 +126,7 @@ public class VuelosSkeleton {
                 }
             }
         }
+        //TODO añadir un indice a cada entrada.
         if (!salidasArrayList.isEmpty() && !regresosArrayList.isEmpty()) {
             for (int i = 0; i < salidasArrayList.size(); i++) {
                 for (int j = 0; j < regresosArrayList.size(); j++) {
