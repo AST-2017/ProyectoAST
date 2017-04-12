@@ -126,11 +126,11 @@ public class VuelosSkeleton {
                 }
             }
         }
-        //TODO añadir un indice a cada entrada.
+        int tamSalidasRegresosArrayList = salidasRegresosArrayList.size();
         if (!salidasArrayList.isEmpty() && !regresosArrayList.isEmpty()) {
             for (int i = 0; i < salidasArrayList.size(); i++) {
                 for (int j = 0; j < regresosArrayList.size(); j++) {
-                    SalidasRegresos salidasRegresos = new SalidasRegresos(
+                    SalidasRegresos salidasRegresos = new SalidasRegresos(tamSalidasRegresosArrayList + i,
                             salidasArrayList.get(i).getPrecio() + regresosArrayList.get(j).getPrecio(),
                             salidasArrayList.get(i).getVueloDirecto(),
                             regresosArrayList.get(j).getVueloDirecto(),
@@ -305,7 +305,7 @@ public class VuelosSkeleton {
             for (int j = 0; j < aerolinesRegreso.length; j++) {
                 String aerolineaSalida = aerolineasSalida[i];
                 String aerolineaRegreso = aerolinesRegreso[i];
-                SalidasRegresos salidasRegresos = new SalidasRegresos(precio, directo, directo, fechaSalida, fechaRegreso,
+                SalidasRegresos salidasRegresos = new SalidasRegresos(i,precio, directo, directo, fechaSalida, fechaRegreso,
                         origenSalida, destinoSalida, destinoSalida, origenSalida, iataCodeOrigenSalida,
                         iataCodeDestinoSalida, iataCodeDestinoSalida, iataCodeOrigenSalida, aerolineaSalida,
                         aerolineaRegreso);

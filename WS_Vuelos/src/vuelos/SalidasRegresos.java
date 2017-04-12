@@ -1,6 +1,7 @@
 package vuelos;
 
 public class SalidasRegresos {
+    private int idOferta;
     private int precio;
     private boolean vueloDirectoSalida;
     private boolean vueloDirectoRegreso;
@@ -17,10 +18,11 @@ public class SalidasRegresos {
     private String aerolineaSalida;
     private String aerolineaRegreso;
 
-    public SalidasRegresos(int precio, boolean vueloDirectoSalida,boolean vueloDirectoRegreso, String fechaSalida, String fechaRegreso,
+    public SalidasRegresos(int idOferta,int precio, boolean vueloDirectoSalida,boolean vueloDirectoRegreso, String fechaSalida, String fechaRegreso,
                            String origenSalida, String destinoSalida, String origenRegreso, String destinoRegreso,
                            String iataCodeOrigenSalida, String iataCodeDestinoSalida, String iataCodeOrigenRegreso,
                            String iataCodeDestinoRegreso, String aerolineaSalida, String aerolineaRegreso){
+        this.idOferta = idOferta;
         this.precio = precio;
         this.vueloDirectoSalida = vueloDirectoSalida;
         this.vueloDirectoRegreso = vueloDirectoRegreso;
@@ -36,6 +38,14 @@ public class SalidasRegresos {
         this.iataCodeDestinoRegreso = iataCodeDestinoRegreso;
         this.aerolineaSalida = aerolineaSalida;
         this.aerolineaRegreso = aerolineaRegreso;
+    }
+
+    public int getIdOferta() {
+        return idOferta;
+    }
+
+    public void setIdOferta(int idOferta) {
+        this.idOferta = idOferta;
     }
 
     public int getPrecio() {
