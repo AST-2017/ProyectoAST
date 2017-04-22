@@ -7,7 +7,6 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,9 +16,9 @@ import java.util.ArrayList;
 
 /**
  * VuelosSkeleton java skeleton for the axisService
- * <p>
+ *
  * Funcionalidad:
- * <p>
+ *
  * Cuando el cliente realiza una peticion, el Orquestador,
  * llamara al servicio web Vuelos, pasandole el aeropuerto
  * de origen, el aeropuerto de destino, la fecha de salida y
@@ -34,22 +33,11 @@ import java.util.ArrayList;
 
 /**
  * Tratamiento de errores:
- * <p>
+ *
  * Los errores, ya sea por algun parámetro incorrecto, por
  * problemas de SkyScanner o porque no hay vuelos Destino-Origen
  * para las fechas seleccionadas, se les notificara al Cliente, por
- * medio también de un mensaje JSON de la forma:
- * <p>
- * Ejemplo:
- * <p>
- * {
- * "ValidationErrors":
- * [
- * {
- * "Message": "Rate limit has been exceeded: 0 PerMinute for PricingSession"
- * }
- * ]
- * }
+ * medio también de un mensaje JSON.
  */
 
 public class VuelosSkeleton {
@@ -69,26 +57,35 @@ public class VuelosSkeleton {
      * @return respuesta de la consulta en formato JSON.
      * @throws IOException para posibles errores con la consulta al servicio REST.
      */
-    public static String getResponseSkyScanner(String originAirport, String destinationAirport, String outboundDate,
+    private static String getResponseSkyScanner(String originAirport, String destinationAirport, String outboundDate,
                                                String inboundDate) throws IOException {
+        Logger.getRootLogger().setLevel(Level.OFF);
         String response = "";
         String request = originAirport + "/" + destinationAirport + "/" + outboundDate + "/" + inboundDate;
         URL url = new URL("http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/ES/eur/es-ES/"
                 + request + "?apikey=prtl6749387986743898559646983194");
-        Logger.getRootLogger().setLevel(Level.OFF);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Accept", "application/json");
 
         if (connection.getResponseCode() != 200) {
-            response = "Failed : HTTP error code : " + connection.getResponseCode();
+            response = "{\n" +
+                    "  \"ValidationErrors\": [\n" +
+                    "    {\n" +
+                    "      \"ParameterName\": \"400 Bad Request\",\n" +
+                    "      \"ParameterValue\": \"400 Bad Request\",\n" +
+                    "      \"Message\": \"400 Bad Request\"\n" +
+                    "    }\n" +
+                    "  ]\n" +
+                    "}";
         } else {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String aux;
             while ((aux = bufferedReader.readLine()) != null) response = response + aux;
         }
         connection.disconnect();
+
         return response;
     }
 
@@ -111,7 +108,7 @@ public class VuelosSkeleton {
      * "Ofertas" con los atributos correspondientes a la clase SalidasRegresos.java
      */
 
-    public static String creteJSON(String responseSkyScanner) throws JSONException, IOException {
+    private static String creteJSON(String responseSkyScanner) throws JSONException, IOException {
         JSONObject object = new JSONObject(responseSkyScanner);
         JSONArray array = object.getJSONArray("Quotes");
         for (int i = 0; i < array.length(); i++) {
@@ -188,7 +185,7 @@ public class VuelosSkeleton {
      * @throws JSONException
      */
 
-    public static void salidas(JSONObject object, JSONObject quote) throws JSONException {
+    private static void salidas(JSONObject object, JSONObject quote) throws JSONException {
         int precio = quote.getInt("MinPrice");
         boolean directo = quote.getBoolean("Direct");
 
@@ -225,7 +222,7 @@ public class VuelosSkeleton {
      * @throws JSONException
      */
 
-    public static void regresos(JSONObject object, JSONObject quote) throws JSONException {
+    private static void regresos(JSONObject object, JSONObject quote) throws JSONException {
         int precio = quote.getInt("MinPrice");
         boolean directo = quote.getBoolean("Direct");
 
@@ -262,7 +259,7 @@ public class VuelosSkeleton {
      * @throws JSONException
      */
 
-    public static void salidasRegresos(JSONObject object, JSONObject quote) throws JSONException {
+    private static void salidasRegresos(JSONObject object, JSONObject quote) throws JSONException {
         int precio = quote.getInt("MinPrice");
         boolean directo = quote.getBoolean("Direct");
 
@@ -322,7 +319,7 @@ public class VuelosSkeleton {
      * @param idCiudad identificador, para encontrar la ciudad y codigo iata.
      * @return(NombreCiudad,iataCode)
      */
-    public static String[] getInfoCiudad(JSONObject object, int idCiudad) throws JSONException {
+    private static String[] getInfoCiudad(JSONObject object, int idCiudad) throws JSONException {
         JSONArray array = object.getJSONArray("Places");
         String[] infociudad = new String[2];
         for (int i = 0; i < array.length(); i++) {
@@ -345,7 +342,7 @@ public class VuelosSkeleton {
      * @return(nombre aerolinea)
      */
 
-    public static String getCarrier(JSONObject object, int carrierID) throws JSONException {
+    private static String getCarrier(JSONObject object, int carrierID) throws JSONException {
         String aerolinea = null;
         JSONArray array = object.getJSONArray("Carriers");
         for (int i = 0; i < array.length(); i++) {

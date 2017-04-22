@@ -1,9 +1,3 @@
-/**
- * AeropuertosSkeleton.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis2 version: 1.7.4  Built on : Oct 21, 2016 (10:47:34 BST)
- */
 package aeropuertos;
 
 import org.apache.axiom.om.OMAbstractFactory;
@@ -23,7 +17,6 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
-
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -34,21 +27,33 @@ import java.util.TreeSet;
  */
 
 public class AeropuertosSkeleton {
-    private  TreeSet<String> aeropuertosOrigen = new TreeSet<>();
-    private  TreeSet<String> aeropuertosDestino = new TreeSet<>();
+    private static TreeSet<String> aeropuertosOrigen = new TreeSet<>();
+    private static TreeSet<String> aeropuertosDestino = new TreeSet<>();
 
     /**
+     * Se van a redefinir los nombres de algunas ciudades
+     * por problemas de compatiblidad con WebServicesX.
+     *
      * @param getInfoAeropuerto
      * @return getInfoAeropuertoResponse
      */
     public aeropuertos.GetInfoAeropuertoResponse getInfoAeropuerto(aeropuertos.GetInfoAeropuerto getInfoAeropuerto) throws AxisFault {
-        GetInfoAeropuertoResponse getInfoAeropuertoResponse = new GetInfoAeropuertoResponse();
-        String ciudadOrigen = getInfoAeropuerto.getCiudadOrigen();
-        String ciudadDestino = getInfoAeropuerto.getCiudadDestino();
         Logger.getRootLogger().setLevel(Level.OFF);
+        GetInfoAeropuertoResponse getInfoAeropuertoResponse = new GetInfoAeropuertoResponse();
+
+        String ciudadOrigen = getInfoAeropuerto.getCiudadOrigen();
+        if (ciudadOrigen.toUpperCase().contains("LA CORUÑA")) ciudadOrigen = "LA CORUNA";
+        if (ciudadOrigen.toUpperCase().contains("SEVILLA")) ciudadOrigen = "SEVILLE";
+        if (ciudadOrigen.toUpperCase().contains("LA PALMA")) ciudadOrigen = "SANTA CRUZ LA PALMA LA PALMA";
+        if (ciudadOrigen.toUpperCase().contains("MADRID")) ciudadOrigen = "MADRID BARAJAS";
+
+        String ciudadDestino = getInfoAeropuerto.getCiudadDestino();
+        if (ciudadDestino.toUpperCase().contains("LA CORUÑA")) ciudadDestino = "LA CORUNA";
+        if (ciudadDestino.toUpperCase().contains("SEVILLA")) ciudadDestino = "SEVILLE";
+        if (ciudadDestino.toUpperCase().contains("LA PALMA")) ciudadDestino = "SANTA CRUZ LA PALMA LA PALMA";
+        if (ciudadDestino.toUpperCase().contains("MADRID")) ciudadDestino = "MADRID BARAJAS";
 
         ServiceClient sc = new ServiceClient();
-
         Options opts = new Options();
         MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
         HttpConnectionManagerParams params = new HttpConnectionManagerParams();
@@ -63,15 +68,45 @@ public class AeropuertosSkeleton {
         opts.setTo(new EndpointReference("http://www.webservicex.net/airport.asmx?WSDL"));
         opts.setAction("http://www.webserviceX.NET/GetAirportInformationByCountry");
         sc.setOptions(opts);
+        OMElement res = sc.sendReceive(createPayLoadAeropuertos());
 
+        getInfoAeropuertoResponse.setAeropuertos(createJSONResponse(res,ciudadOrigen,ciudadDestino));
+
+        return getInfoAeropuertoResponse;
+    }
+
+    /**
+     * Metodo que crea el cuerpo del mensaje SOAP para contactar
+     * con el servicio externo webservicesX.
+     *
+     * @return en formato SOAP, todos los aeropuertos de España.
+     */
+
+    private static OMElement createPayLoadAeropuertos(){
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace omNs = fac.createOMNamespace("http://www.webserviceX.NET", "ns");
-        OMElement method = fac.createOMElement("GetAirportInformationByCountry", omNs);
+        OMElement omElement = fac.createOMElement("GetAirportInformationByCountry", omNs);
         OMElement value = fac.createOMElement("country", omNs);
         value.setText("Spain");
-        method.addChild(value);
-        OMElement res = sc.sendReceive(method);
+        omElement.addChild(value);
 
+        return omElement;
+    }
+
+    /**
+     * Método que parsea la respuesta del servicio SOAP externo a los aeropuertos
+     * de interés para nuestro servicio y crea la respuesta para el orquestador
+     * en formato JSON.
+     *
+     * @param res
+     * @param ciudadOrigen
+     * @param ciudadDestino
+     *
+     * @return los aeropuertos de la ciudad de origen y la ciudad de destino
+     * en formato JSON.
+     */
+
+    private static String createJSONResponse(OMElement res, String ciudadOrigen, String ciudadDestino){
         String json = XML.toJSONObject(res.getFirstElement().getText()).toString();
         JSONObject response = new JSONObject(json);
         JSONObject NewDataSet = response.getJSONObject("NewDataSet");
@@ -103,11 +138,10 @@ public class AeropuertosSkeleton {
             else jsonResopnse = jsonResopnse + "\"" + aeropuertoDestino + "\"";
         }
         jsonResopnse = jsonResopnse + "]\n" + "  }\n" + "}";
+
         aeropuertosOrigen.clear();
         aeropuertosDestino.clear();
 
-        getInfoAeropuertoResponse.setAeropuertos(jsonResopnse);
-
-        return getInfoAeropuertoResponse;
+        return jsonResopnse;
     }
 }
