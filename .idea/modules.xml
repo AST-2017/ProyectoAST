@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/WS_Aeropuertos/WS_Aeropuertos.iml" filepath="$PROJECT_DIR$/WS_Aeropuertos/WS_Aeropuertos.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WS_Orquestador/WS_Orquestador.iml" filepath="$PROJECT_DIR$/WS_Orquestador/WS_Orquestador.iml" />
       <module fileurl="file://$PROJECT_DIR$/WS_Vuelos/WS_Vuelos.iml" filepath="$PROJECT_DIR$/WS_Vuelos/WS_Vuelos.iml" />
     </modules>
   </component>
