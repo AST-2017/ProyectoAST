@@ -2,7 +2,7 @@
 <!-- This file was auto-generated from WSDL -->
 <!-- by the Apache Axis2 version: 1.7.4  Built on : Oct 21, 2016 (10:47:34 BST) -->
 <serviceGroup>
-    <service name="Orquestador">
+    <service name="Orquestador" class="orquestador.OrquestadorSkeleton">
         <messageReceivers>
             <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="orquestador.OrquestadorMessageReceiverInOut"/>
         </messageReceivers>

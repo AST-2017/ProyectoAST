@@ -73,8 +73,6 @@ public class VuelosSkeleton {
             response = "{\n" +
                     "  \"ValidationErrors\": [\n" +
                     "    {\n" +
-                    "      \"ParameterName\": \"400 Bad Request\",\n" +
-                    "      \"ParameterValue\": \"400 Bad Request\",\n" +
                     "      \"Message\": \"400 Bad Request\"\n" +
                     "    }\n" +
                     "  ]\n" +

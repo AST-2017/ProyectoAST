@@ -25,6 +25,8 @@
                         <xs:element name="id_oferta" type="xs:int"/>
                         <xs:element minOccurs="0" name="dni" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="token" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="email" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="cuenta" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
