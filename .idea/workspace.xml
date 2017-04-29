@@ -1,27 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6566f9d3-0fdd-4f2d-94cb-c710ca6d3b9e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_staging_/schema/orquestadorBBDD/routine/insertarCliente.(varchar(100),varchar(100),varchar(100),char(9),varchar(100),int(11),varchar(100)).sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/kotlinc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/ReservasClientes.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/AST-ProyectoContinua-2016-2017.pdf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Dieseño inicial.pdf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib.zip" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Vuelos/build/classes/vuelos/VuelosSkeleton.class" afterPath="$PROJECT_DIR$/WS_Vuelos/build/classes/vuelos/VuelosSkeleton.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Vuelos/build/lib/Vuelos.aar" afterPath="$PROJECT_DIR$/WS_Vuelos/build/lib/Vuelos.aar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.xml" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" />
+    <list default="true" id="6566f9d3-0fdd-4f2d-94cb-c710ca6d3b9e" name="Default" comment="Se arregla el envio de id_oferta por parte del WS_Vuelos.&#10;Se modifica la forma de enviar la fecha por parte del WS_Vuelos.&#10;Se añaden nuevos metdos al servicio orquestador.&#10;Se añaden los .sql necesarios para el correcto funcionamiento de la base de datos del orquestador.&#10;">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/cache_orquestador.sql" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Orquestador/WS_Orquestador.iml" afterPath="$PROJECT_DIR$/WS_Orquestador/WS_Orquestador.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Orquestador/resources/Orquestador.wsdl" afterPath="$PROJECT_DIR$/WS_Orquestador/resources/Orquestador.wsdl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Orquestador/resources/services.xml" afterPath="$PROJECT_DIR$/WS_Orquestador/resources/services.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/ComprarBillete.java" afterPath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/ComprarBillete.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/ComprarBilleteResponse.java" afterPath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/ComprarBilleteResponse.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/ObtenerOfertas.java" afterPath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/ObtenerOfertas.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/OrquestadorMessageReceiverInOut.java" afterPath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/OrquestadorMessageReceiverInOut.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/OrquestadorSkeleton.java" afterPath="$PROJECT_DIR$/WS_Orquestador/src/orquestador/OrquestadorSkeleton.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WS_Vuelos/src/vuelos/VuelosSkeleton.java" afterPath="$PROJECT_DIR$/WS_Vuelos/src/vuelos/VuelosSkeleton.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -69,7 +51,7 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="OrquestadorSkeleton.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="OrquestadorSkeleton.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/WS_Orquestador/src/orquestador/OrquestadorSkeleton.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-1721">
@@ -77,6 +59,16 @@
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VuelosSkeleton.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/WS_Vuelos/src/vuelos/VuelosSkeleton.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2145">
+              <caret line="155" column="109" lean-forward="false" selection-start-line="155" selection-start-column="109" selection-end-line="155" selection-end-column="109" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -133,8 +125,8 @@
         <option value="/2b58791f/f4ad0b96-964f-4768-9e67-7fdb55e458ae/schema/orquestadorBBDD/routine/insertarCliente.(varchar(100),varchar(100),varchar(100),char(9),varchar(100),int(11),varchar(100)).sql" />
         <option value="$PROJECT_DIR$/WS_Orquestador/src/orquestador/ReservasClientes.java" />
         <option value="$PROJECT_DIR$/WS_Vuelos/src/vuelos/VuelosSkeleton.java" />
-        <option value="$PROJECT_DIR$/WS_Orquestador/src/orquestador/OrquestadorSkeleton.java" />
         <option value="$PROJECT_DIR$/WS_Orquestador/bbdd/procedimientosAlmacenados.sql" />
+        <option value="$PROJECT_DIR$/WS_Orquestador/src/orquestador/OrquestadorSkeleton.java" />
       </list>
     </option>
   </component>
@@ -191,24 +183,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="WS_Vuelos" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="vuelos" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ProyectoAST" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="WS_Orquestador" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -219,11 +193,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="WS_Orquestador" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bbdd" />
+              <option name="myItemId" value="WS_Aeropuertos" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -755,7 +725,7 @@
       <workItem from="1493377079599" duration="10929000" />
       <workItem from="1493392596419" duration="25000" />
       <workItem from="1493392659397" duration="3961000" />
-      <workItem from="1493457743952" duration="13548000" />
+      <workItem from="1493457743952" duration="13848000" />
     </task>
     <task id="LOCAL-00001" summary="WS_Vuelos and WS_Aeropuertos modified the limit conexion, &#10;WS_Aeropuertos now returns the response in JSON format">
       <created>1492027509403</created>
@@ -799,11 +769,18 @@
       <option name="project" value="LOCAL" />
       <updated>1493080892598</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Se arregla el envio de id_oferta por parte del WS_Vuelos.&#10;Se modifica la forma de enviar la fecha por parte del WS_Vuelos.&#10;Se añaden nuevos metdos al servicio orquestador.&#10;Se añaden los .sql necesarios para el correcto funcionamiento de la base de datos del orquestador.&#10;">
+      <created>1493473430308</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1493473430308</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="91198000" />
+    <option name="totallyTimeSpent" value="91498000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -816,7 +793,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-321" y="-1080" width="1920" height="1080" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -839,7 +816,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.11089109" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0990099" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17784877" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17784877" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32970297" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -907,12 +884,14 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
     <MESSAGE value="WS_Vuelos and WS_Aeropuertos modified the limit conexion, &#10;WS_Aeropuertos now returns the response in JSON format" />
     <MESSAGE value="WS_Vuelos and WS_Aeropuertos modified the limit conexion, &#10;WS_Aeropuertos now returns the response in JSON format,&#10;ADD an id to the JSON response of WS_Vuelos" />
     <MESSAGE value="Se añade control de errores.&#10;Se redefinen algunas ciudades que daban problema con WebServicesX." />
     <MESSAGE value="Se añade Orquestador y llamada asincrona" />
     <MESSAGE value="Se añade llamada asincrona al Orquestador&#10;Se crea la base de datos&#10;Se crean dos procedimientos almacenados uno para insertar y otro para consultar&#10;Se establece desde codigo conexion con dichos procedimientos&#10;Se definen los mensajes de errores&#10;" />
-    <option name="LAST_COMMIT_MESSAGE" value="Se añade llamada asincrona al Orquestador&#10;Se crea la base de datos&#10;Se crean dos procedimientos almacenados uno para insertar y otro para consultar&#10;Se establece desde codigo conexion con dichos procedimientos&#10;Se definen los mensajes de errores&#10;" />
+    <MESSAGE value="Se arregla el envio de id_oferta por parte del WS_Vuelos.&#10;Se modifica la forma de enviar la fecha por parte del WS_Vuelos.&#10;Se añaden nuevos metdos al servicio orquestador.&#10;Se añaden los .sql necesarios para el correcto funcionamiento de la base de datos del orquestador.&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Se arregla el envio de id_oferta por parte del WS_Vuelos.&#10;Se modifica la forma de enviar la fecha por parte del WS_Vuelos.&#10;Se añaden nuevos metdos al servicio orquestador.&#10;Se añaden los .sql necesarios para el correcto funcionamiento de la base de datos del orquestador.&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -925,13 +904,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/WS_Aeropuertos/src/aeropuertos/AeropuertosSkeleton.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1215">
-          <caret line="81" column="41" lean-forward="true" selection-start-line="81" selection-start-column="41" selection-end-line="81" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/WS_Vuelos/build.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1173,18 +1145,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/WS_Vuelos/src/vuelos/VuelosSkeleton.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2145">
-          <caret line="155" column="109" lean-forward="false" selection-start-line="155" selection-start-column="109" selection-end-line="155" selection-end-column="109" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/WS_Orquestador/bbdd/procedimientosAlmacenados.sql">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2237">
           <caret line="99" column="4" lean-forward="false" selection-start-line="99" selection-start-column="4" selection-end-line="99" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/WS_Vuelos/derby.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1196,6 +1168,14 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/WS_Vuelos/src/vuelos/VuelosSkeleton.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2145">
+          <caret line="155" column="109" lean-forward="false" selection-start-line="155" selection-start-column="109" selection-end-line="155" selection-end-column="109" />
+          <folding />
         </state>
       </provider>
     </entry>
