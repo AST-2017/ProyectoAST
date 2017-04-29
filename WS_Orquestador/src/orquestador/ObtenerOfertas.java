@@ -61,6 +61,17 @@ public class ObtenerOfertas implements org.apache.axis2.databinding.ADBBean {
      */
     protected boolean localFechaRegresoTracker = false;
 
+    /**
+     * field for Dni
+     */
+    protected java.lang.String localDni;
+
+    /*  This tracker boolean wil be used to detect whether the user called the set method
+     *   for this attribute. It will be used to determine whether to include this field
+     *   in the serialized XML
+     */
+    protected boolean localDniTracker = false;
+
     public boolean isCiudadOrigenSpecified() {
         return localCiudadOrigenTracker;
     }
@@ -149,6 +160,28 @@ public class ObtenerOfertas implements org.apache.axis2.databinding.ADBBean {
         this.localFechaRegreso = param;
     }
 
+    public boolean isDniSpecified() {
+        return localDniTracker;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.lang.String
+     */
+    public java.lang.String getDni() {
+        return localDni;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param Dni
+     */
+    public void setDni(java.lang.String param) {
+        localDniTracker = true;
+
+        this.localDni = param;
+    }
+
     /**
      *
      * @param parentQName
@@ -165,15 +198,13 @@ public class ObtenerOfertas implements org.apache.axis2.databinding.ADBBean {
 
     public void serialize(final javax.xml.namespace.QName parentQName,
         javax.xml.stream.XMLStreamWriter xmlWriter)
-        throws javax.xml.stream.XMLStreamException,
-            org.apache.axis2.databinding.ADBException {
+        throws javax.xml.stream.XMLStreamException {
         serialize(parentQName, xmlWriter, false);
     }
 
     public void serialize(final javax.xml.namespace.QName parentQName,
         javax.xml.stream.XMLStreamWriter xmlWriter, boolean serializeType)
-        throws javax.xml.stream.XMLStreamException,
-            org.apache.axis2.databinding.ADBException {
+        throws javax.xml.stream.XMLStreamException {
         java.lang.String prefix = null;
         java.lang.String namespace = null;
 
@@ -257,6 +288,22 @@ public class ObtenerOfertas implements org.apache.axis2.databinding.ADBBean {
                     xmlWriter);
             } else {
                 xmlWriter.writeCharacters(localFechaRegreso);
+            }
+
+            xmlWriter.writeEndElement();
+        }
+
+        if (localDniTracker) {
+            namespace = "http://Orquestador";
+            writeStartElement(null, namespace, "dni", xmlWriter);
+
+            if (localDni == null) {
+                // write the nil attribute
+                writeAttribute("xsi",
+                    "http://www.w3.org/2001/XMLSchema-instance", "nil", "1",
+                    xmlWriter);
+            } else {
+                xmlWriter.writeCharacters(localDni);
             }
 
             xmlWriter.writeEndElement();
@@ -628,6 +675,33 @@ public class ObtenerOfertas implements org.apache.axis2.databinding.ADBBean {
                         java.lang.String content = reader.getElementText();
 
                         object.setFechaRegreso(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                                content));
+                    } else {
+                        reader.getElementText(); // throw away text nodes if any.
+                    }
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if ((reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://Orquestador",
+                            "dni").equals(reader.getName())) ||
+                        new javax.xml.namespace.QName("", "dni").equals(
+                            reader.getName())) {
+                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "nil");
+
+                    if (!"true".equals(nillableValue) &&
+                            !"1".equals(nillableValue)) {
+                        java.lang.String content = reader.getElementText();
+
+                        object.setDni(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
                                 content));
                     } else {
                         reader.getElementText(); // throw away text nodes if any.

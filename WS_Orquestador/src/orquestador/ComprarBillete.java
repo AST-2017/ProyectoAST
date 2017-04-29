@@ -34,37 +34,15 @@ public class ComprarBillete implements org.apache.axis2.databinding.ADBBean {
     protected boolean localDniTracker = false;
 
     /**
-     * field for Token
+     * field for Iban
      */
-    protected java.lang.String localToken;
+    protected java.lang.String localIban;
 
     /*  This tracker boolean wil be used to detect whether the user called the set method
      *   for this attribute. It will be used to determine whether to include this field
      *   in the serialized XML
      */
-    protected boolean localTokenTracker = false;
-
-    /**
-     * field for Email
-     */
-    protected java.lang.String localEmail;
-
-    /*  This tracker boolean wil be used to detect whether the user called the set method
-     *   for this attribute. It will be used to determine whether to include this field
-     *   in the serialized XML
-     */
-    protected boolean localEmailTracker = false;
-
-    /**
-     * field for Cuenta
-     */
-    protected java.lang.String localCuenta;
-
-    /*  This tracker boolean wil be used to detect whether the user called the set method
-     *   for this attribute. It will be used to determine whether to include this field
-     *   in the serialized XML
-     */
-    protected boolean localCuentaTracker = false;
+    protected boolean localIbanTracker = false;
 
     /**
      * Auto generated getter method
@@ -104,70 +82,26 @@ public class ComprarBillete implements org.apache.axis2.databinding.ADBBean {
         this.localDni = param;
     }
 
-    public boolean isTokenSpecified() {
-        return localTokenTracker;
+    public boolean isIbanSpecified() {
+        return localIbanTracker;
     }
 
     /**
      * Auto generated getter method
      * @return java.lang.String
      */
-    public java.lang.String getToken() {
-        return localToken;
+    public java.lang.String getIban() {
+        return localIban;
     }
 
     /**
      * Auto generated setter method
-     * @param param Token
+     * @param param Iban
      */
-    public void setToken(java.lang.String param) {
-        localTokenTracker = true;
+    public void setIban(java.lang.String param) {
+        localIbanTracker = true;
 
-        this.localToken = param;
-    }
-
-    public boolean isEmailSpecified() {
-        return localEmailTracker;
-    }
-
-    /**
-     * Auto generated getter method
-     * @return java.lang.String
-     */
-    public java.lang.String getEmail() {
-        return localEmail;
-    }
-
-    /**
-     * Auto generated setter method
-     * @param param Email
-     */
-    public void setEmail(java.lang.String param) {
-        localEmailTracker = true;
-
-        this.localEmail = param;
-    }
-
-    public boolean isCuentaSpecified() {
-        return localCuentaTracker;
-    }
-
-    /**
-     * Auto generated getter method
-     * @return java.lang.String
-     */
-    public java.lang.String getCuenta() {
-        return localCuenta;
-    }
-
-    /**
-     * Auto generated setter method
-     * @param param Cuenta
-     */
-    public void setCuenta(java.lang.String param) {
-        localCuentaTracker = true;
-
-        this.localCuenta = param;
+        this.localIban = param;
     }
 
     /**
@@ -186,15 +120,13 @@ public class ComprarBillete implements org.apache.axis2.databinding.ADBBean {
 
     public void serialize(final javax.xml.namespace.QName parentQName,
         javax.xml.stream.XMLStreamWriter xmlWriter)
-        throws javax.xml.stream.XMLStreamException,
-            org.apache.axis2.databinding.ADBException {
+        throws javax.xml.stream.XMLStreamException {
         serialize(parentQName, xmlWriter, false);
     }
 
     public void serialize(final javax.xml.namespace.QName parentQName,
         javax.xml.stream.XMLStreamWriter xmlWriter, boolean serializeType)
-        throws javax.xml.stream.XMLStreamException,
-            org.apache.axis2.databinding.ADBException {
+        throws javax.xml.stream.XMLStreamException {
         java.lang.String prefix = null;
         java.lang.String namespace = null;
 
@@ -248,49 +180,17 @@ public class ComprarBillete implements org.apache.axis2.databinding.ADBBean {
             xmlWriter.writeEndElement();
         }
 
-        if (localTokenTracker) {
+        if (localIbanTracker) {
             namespace = "http://Orquestador";
-            writeStartElement(null, namespace, "token", xmlWriter);
+            writeStartElement(null, namespace, "iban", xmlWriter);
 
-            if (localToken == null) {
+            if (localIban == null) {
                 // write the nil attribute
                 writeAttribute("xsi",
                     "http://www.w3.org/2001/XMLSchema-instance", "nil", "1",
                     xmlWriter);
             } else {
-                xmlWriter.writeCharacters(localToken);
-            }
-
-            xmlWriter.writeEndElement();
-        }
-
-        if (localEmailTracker) {
-            namespace = "http://Orquestador";
-            writeStartElement(null, namespace, "email", xmlWriter);
-
-            if (localEmail == null) {
-                // write the nil attribute
-                writeAttribute("xsi",
-                    "http://www.w3.org/2001/XMLSchema-instance", "nil", "1",
-                    xmlWriter);
-            } else {
-                xmlWriter.writeCharacters(localEmail);
-            }
-
-            xmlWriter.writeEndElement();
-        }
-
-        if (localCuentaTracker) {
-            namespace = "http://Orquestador";
-            writeStartElement(null, namespace, "cuenta", xmlWriter);
-
-            if (localCuenta == null) {
-                // write the nil attribute
-                writeAttribute("xsi",
-                    "http://www.w3.org/2001/XMLSchema-instance", "nil", "1",
-                    xmlWriter);
-            } else {
-                xmlWriter.writeCharacters(localCuenta);
+                xmlWriter.writeCharacters(localIban);
             }
 
             xmlWriter.writeEndElement();
@@ -628,8 +528,8 @@ public class ComprarBillete implements org.apache.axis2.databinding.ADBBean {
 
                 if ((reader.isStartElement() &&
                         new javax.xml.namespace.QName("http://Orquestador",
-                            "token").equals(reader.getName())) ||
-                        new javax.xml.namespace.QName("", "token").equals(
+                            "iban").equals(reader.getName())) ||
+                        new javax.xml.namespace.QName("", "iban").equals(
                             reader.getName())) {
                     nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
                             "nil");
@@ -638,61 +538,7 @@ public class ComprarBillete implements org.apache.axis2.databinding.ADBBean {
                             !"1".equals(nillableValue)) {
                         java.lang.String content = reader.getElementText();
 
-                        object.setToken(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
-                                content));
-                    } else {
-                        reader.getElementText(); // throw away text nodes if any.
-                    }
-
-                    reader.next();
-                } // End of if for expected property start element
-
-                else {
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                    reader.next();
-
-                if ((reader.isStartElement() &&
-                        new javax.xml.namespace.QName("http://Orquestador",
-                            "email").equals(reader.getName())) ||
-                        new javax.xml.namespace.QName("", "email").equals(
-                            reader.getName())) {
-                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
-                            "nil");
-
-                    if (!"true".equals(nillableValue) &&
-                            !"1".equals(nillableValue)) {
-                        java.lang.String content = reader.getElementText();
-
-                        object.setEmail(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
-                                content));
-                    } else {
-                        reader.getElementText(); // throw away text nodes if any.
-                    }
-
-                    reader.next();
-                } // End of if for expected property start element
-
-                else {
-                }
-
-                while (!reader.isStartElement() && !reader.isEndElement())
-                    reader.next();
-
-                if ((reader.isStartElement() &&
-                        new javax.xml.namespace.QName("http://Orquestador",
-                            "cuenta").equals(reader.getName())) ||
-                        new javax.xml.namespace.QName("", "cuenta").equals(
-                            reader.getName())) {
-                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
-                            "nil");
-
-                    if (!"true".equals(nillableValue) &&
-                            !"1".equals(nillableValue)) {
-                        java.lang.String content = reader.getElementText();
-
-                        object.setCuenta(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                        object.setIban(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
                                 content));
                     } else {
                         reader.getElementText(); // throw away text nodes if any.

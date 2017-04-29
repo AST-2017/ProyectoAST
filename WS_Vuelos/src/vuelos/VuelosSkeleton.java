@@ -46,6 +46,34 @@ public class VuelosSkeleton {
     private static ArrayList<SalidasRegresos> salidasRegresosArrayList = new ArrayList<>();
 
     /**
+     * Metodo getInfoVuelos:
+     * llama al metodo getResponseSkyScanner que devuelve
+     * la consulta en formato JSON, se alamcena en la etiqueta
+     * <vuelos></vuelos> del mensaje SOAP de respuesta.
+     *
+     * @param getInfoVuelos
+     * @return getInfoVuelosResponse
+     */
+    public vuelos.GetInfoVuelosResponse getInfoVuelos(vuelos.GetInfoVuelos getInfoVuelos) throws IOException, JSONException {
+        GetInfoVuelosResponse getInfoVuelosResponse = new GetInfoVuelosResponse();
+        String originAirport = getInfoVuelos.getOriginAirport();
+        String destinationAirport = getInfoVuelos.getDestinationAirport();
+        String outboundDate = getInfoVuelos.getOutboundDate();
+        String inboundDate = getInfoVuelos.getInboundDate();
+        String responseClient;
+
+        String responseSkyScanner = getResponseSkyScanner(originAirport, destinationAirport, outboundDate, inboundDate);
+
+        JSONObject object = new JSONObject(responseSkyScanner);
+        if (object.has("ValidationErrors")) responseClient = responseSkyScanner;
+        else responseClient = creteJSON(responseSkyScanner);
+
+        getInfoVuelosResponse.setVuelos(responseClient);
+
+        return getInfoVuelosResponse;
+    }
+
+    /**
      * Este metodo, contacta con el servicio de SkyScanner,
      * obteniendo los resultados en base a los siguientes
      * parametros:
@@ -121,11 +149,11 @@ public class VuelosSkeleton {
                 }
             }
         }
-        int tamSalidasRegresosArrayList = salidasRegresosArrayList.size();
+
         if (!salidasArrayList.isEmpty() && !regresosArrayList.isEmpty()) {
             for (int i = 0; i < salidasArrayList.size(); i++) {
                 for (int j = 0; j < regresosArrayList.size(); j++) {
-                    SalidasRegresos salidasRegresos = new SalidasRegresos(tamSalidasRegresosArrayList + i,
+                    SalidasRegresos salidasRegresos = new SalidasRegresos(salidasRegresosArrayList.size() + 1,
                             salidasArrayList.get(i).getPrecio() + regresosArrayList.get(j).getPrecio(),
                             salidasArrayList.get(i).getVueloDirecto(),
                             regresosArrayList.get(j).getVueloDirecto(),
@@ -194,6 +222,8 @@ public class VuelosSkeleton {
         int idOrigen = outboundObject.getInt("OriginId");
         int idDestino = outboundObject.getInt("DestinationId");
         String fecha = outboundObject.getString("DepartureDate");
+        String[] split = fecha.trim().split("T");
+        fecha = split[0];
 
         String[] infociudadOrigen = getInfoCiudad(object, idOrigen);
         String origen = infociudadOrigen[0];
@@ -231,6 +261,8 @@ public class VuelosSkeleton {
         int idOrigen = inboundObject.getInt("OriginId");
         int idDestino = inboundObject.getInt("DestinationId");
         String fecha = inboundObject.getString("DepartureDate");
+        String[] split = fecha.trim().split("T");
+        fecha = split[0];
 
         String[] infociudadOrigen = getInfoCiudad(object, idOrigen);
         String origen = infociudadOrigen[0];
@@ -268,14 +300,16 @@ public class VuelosSkeleton {
         int idOrigenSalida = outboundObject.getInt("OriginId");
         int idDestinoSalida = outboundObject.getInt("DestinationId");
         String fechaSalida = outboundObject.getString("DepartureDate");
+        String[] split = fechaSalida.trim().split("T");
+        fechaSalida = split[0];
 
         JSONObject inboundObject = quote.getJSONObject("InboundLeg");
         JSONArray carrierIdsRegreso = inboundObject.getJSONArray("CarrierIds");
         int[] idsAerolineaRegreso = new int[carrierIdsRegreso.length()];
         for (int i = 0; i < carrierIdsRegreso.length(); i++) idsAerolineaRegreso[i] = carrierIdsRegreso.getInt(i);
-        int idOrigenRegreso = inboundObject.getInt("OriginId");
-        int idDestinoRegreso = inboundObject.getInt("DestinationId");
         String fechaRegreso = inboundObject.getString("DepartureDate");
+        String[] split2 = fechaRegreso.trim().split("T");
+        fechaRegreso = split2[0];
 
 
         String[] infociudadOrigenSalida = getInfoCiudad(object, idOrigenSalida);
@@ -300,7 +334,7 @@ public class VuelosSkeleton {
             for (int j = 0; j < aerolinesRegreso.length; j++) {
                 String aerolineaSalida = aerolineasSalida[i];
                 String aerolineaRegreso = aerolinesRegreso[i];
-                SalidasRegresos salidasRegresos = new SalidasRegresos(i,precio, directo, directo, fechaSalida, fechaRegreso,
+                SalidasRegresos salidasRegresos = new SalidasRegresos(salidasRegresosArrayList.size() + 1,precio, directo, directo, fechaSalida, fechaRegreso,
                         origenSalida, destinoSalida, destinoSalida, origenSalida, iataCodeOrigenSalida,
                         iataCodeDestinoSalida, iataCodeDestinoSalida, iataCodeOrigenSalida, aerolineaSalida,
                         aerolineaRegreso);
@@ -352,33 +386,4 @@ public class VuelosSkeleton {
 
         return aerolinea;
     }
-
-    /**
-     * Metodo getInfoVuelos:
-     * llama al metodo getResponseSkyScanner que devuelve
-     * la consulta en formato JSON, se alamcena en la etiqueta
-     * <vuelos></vuelos> del mensaje SOAP de respuesta.
-     *
-     * @param getInfoVuelos
-     * @return getInfoVuelosResponse
-     */
-    public vuelos.GetInfoVuelosResponse getInfoVuelos(vuelos.GetInfoVuelos getInfoVuelos) throws IOException, JSONException {
-        GetInfoVuelosResponse getInfoVuelosResponse = new GetInfoVuelosResponse();
-        String originAirport = getInfoVuelos.getOriginAirport();
-        String destinationAirport = getInfoVuelos.getDestinationAirport();
-        String outboundDate = getInfoVuelos.getOutboundDate();
-        String inboundDate = getInfoVuelos.getInboundDate();
-        String responseClient;
-
-        String responseSkyScanner = getResponseSkyScanner(originAirport, destinationAirport, outboundDate, inboundDate);
-
-        JSONObject object = new JSONObject(responseSkyScanner);
-        if (object.has("ValidationErrors")) responseClient = responseSkyScanner;
-        else responseClient = creteJSON(responseSkyScanner);
-
-        getInfoVuelosResponse.setVuelos(responseClient);
-
-        return getInfoVuelosResponse;
-    }
-
 }

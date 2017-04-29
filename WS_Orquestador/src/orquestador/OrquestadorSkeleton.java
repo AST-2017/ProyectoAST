@@ -1,9 +1,3 @@
-/**
- * OrquestadorSkeleton.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis2 version: 1.7.4  Built on : Oct 21, 2016 (10:47:34 BST)
- */
 package orquestador;
 
 import org.apache.axiom.om.OMAbstractFactory;
@@ -15,24 +9,23 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.client.async.AxisCallback;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.engine.ServiceLifeCycle;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 
-public class OrquestadorSkeleton implements ServiceLifeCycle{
-    //TODO la fecha debe introducirse de una forma en especial yyyy-mm-dd, hay que comprobar eso.
-
+public class OrquestadorSkeleton {
     private static boolean fin = false;
     private static boolean onFault = false, onError = false, onComplete = false;
     private static String jsonRespAeropuertos = "";
@@ -44,23 +37,15 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
     private static String iataDestinoCallBack = null;
 
     // JDBC nombre del driver y url de la base de datos
-    private static final String url = "jdbc:mysql://localhost:3306/cache_iata?useSSL=false";
-    private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    private static final String url = "jdbc:mysql://localhost:3306/orquestadorBBDD?useSSL=false";
 
     // Credenciales para la base de datos
     private static final String user = "ast";
-    private static final String password = "Proyectoast2017!";
-
-    // UDDI
-    private static Publish sp = new Publish();
-    private static String servicio = "Orquestador";
-    private static String endpoint = "http://localhost:8080/axis2/services/Orquestador";
+    private static final String password = "ast";
 
     //Llamada asincrona.
     public static class MyCallBack implements  AxisCallback{
         public void onMessage(MessageContext messageContext) {
-            //TODO ¿Borrar este punto de control o dejarlos para el catalina.out?
-            System.out.println("Llamada asincrona recibida");
             OMElement response = messageContext.getEnvelope().getBody().getFirstElement();
             jsonRespAeropuertos = response.getFirstElement().getText();
         }
@@ -82,29 +67,24 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
                 iataOrigenCallBack = arrayAerOrig.get(0).toString();
                 iataDestinoCallBack = arrayAerDest.get(0).toString();
                 try {
-                    // Register JDBC driver
-                    Class.forName(JDBC_DRIVER);
-
-                    // Open connection
+                    //Open connection
                     Connection  connection = DriverManager.getConnection(url,user,password);
 
                     //language=MySQL
-                    String sql = "{CALL introducir_iata(?,?)}";
-                    CallableStatement callableStatement = connection.prepareCall(sql);
-                    callableStatement.setString(1,origen);
-                    callableStatement.setString(2,iataOrigenCallBack);
-                    callableStatement.executeQuery();
+                    String sql = "{CALL introducirIata(?,?)}";
+                    CallableStatement introducirIata = connection.prepareCall(sql);
+                    introducirIata.setString(1,origen);
+                    introducirIata.setString(2,iataOrigenCallBack);
+                    introducirIata.executeQuery();
 
-                    callableStatement.setString(1,destino);
-                    callableStatement.setString(2,iataDestinoCallBack);
-                    callableStatement.executeQuery();
+                    introducirIata.setString(1,destino);
+                    introducirIata.setString(2,iataDestinoCallBack);
+                    introducirIata.executeQuery();
 
                     // Clean the environment:
-                    callableStatement.close();
+                    introducirIata.close();
                     connection.close();
 
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -116,12 +96,225 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
         }
     }
 
-    public void startUp(ConfigurationContext configurationContext, AxisService axisService) {
-        //sp.publish(servicio,endpoint);
+    /**
+     * Método encargado de registrar un cliente en la base de datos.
+     *
+     * @return true: si el registro se ha realizado de forma satisfactoria.
+     *         false: si ya existe un usuario con ese nombre en el sistema.
+     */
+    public orquestador.RegistrarClienteResponse registrarCliente(orquestador.RegistrarCliente registrarCliente)
+            throws ClassNotFoundException, SQLException {
+        RegistrarClienteResponse registrarClienteResponse = new RegistrarClienteResponse();
+        registrarClienteResponse.setConfirmacion(false);
+        String nombre = registrarCliente.getNombre();
+        String apellido1 = registrarCliente.getApellido1();
+        String apellido2 = registrarCliente.getApellido2();
+        String dni = registrarCliente.getDni();
+        String email = registrarCliente.getEmail();
+        int telefono = Integer.parseInt(registrarCliente.getTelefono());
+        String pass = registrarCliente.getPassword();
+
+        // Register JDBC driver and Open connection
+        Connection  connection = null;
+        try {
+            connection = DriverManager.getConnection(url,user,password);
+
+            //language=MySQL
+            String sql = "{CALL insertarCliente(?,?,?,?,?,?,?)}";
+            CallableStatement insetarCliente = connection.prepareCall(sql);
+            insetarCliente.setString(1,nombre);
+            insetarCliente.setString(2,apellido1);
+            insetarCliente.setString(3,apellido2);
+            insetarCliente.setString(4,dni);
+            insetarCliente.setString(5,email);
+            insetarCliente.setInt(6,telefono);
+            insetarCliente.setString(7,pass);
+            insetarCliente.executeQuery();
+
+            insetarCliente.close();
+            registrarClienteResponse.setConfirmacion(true);
+
+            //close connection.
+            connection.close();
+        } catch (SQLException e) {
+            registrarClienteResponse.setConfirmacion(false);
+        }
+
+        return registrarClienteResponse;
     }
 
-    public void shutDown(ConfigurationContext configurationContext, AxisService axisService) {
-        //sp.unpublish();
+    /**
+     * Método para comprarBillete.
+     *
+     * @return
+     */
+    public orquestador.ComprarBilleteResponse comprarBillete(orquestador.ComprarBillete comprarBillete) {
+        Logger.getRootLogger().setLevel(Level.OFF);
+        ComprarBilleteResponse comprarBilleteResponse = new ComprarBilleteResponse();
+        int id_oferta = comprarBillete.getId_oferta();
+        String dni = comprarBillete.getDni();
+        String iban = comprarBillete.getIban();
+        //TODO token.
+        String token = "123456";
+        String cuentaDestino = "12345678";
+        int importe = 0;
+
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(url,user,password);
+
+            //obtener el precio, para enviar mensaje a Banco.
+            //language=MySQL
+            String sql = "{CALL obtenerPrecioOferta(?,?)}";
+            CallableStatement obtenerPrecioOferta = connection.prepareCall(sql);
+            obtenerPrecioOferta.setString(1,dni);
+            obtenerPrecioOferta.setInt(2,id_oferta);
+            ResultSet resultSet = obtenerPrecioOferta.executeQuery();
+            while (resultSet.next()) importe = resultSet.getInt("precio");
+            obtenerPrecioOferta.close();
+
+
+            //TODO insertar aquí la comunicación y posterior respuesta del servicio Banco.
+
+            //insertar reserva en base de datos.
+            //language=MySQL
+            sql = "{CALL insertarReserva(?,?)}";
+            CallableStatement insertarReserva = connection.prepareCall(sql);
+            insertarReserva.setString(1,dni);
+            insertarReserva.setInt(2,id_oferta);
+            insertarReserva.executeQuery();
+
+            insertarReserva.close();
+            connection.close();
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
+
+        return comprarBilleteResponse;
+    }
+
+    /**
+     * Metodo para devolver al cliente todas sus reservas.
+     *
+     * @return un String con alguna de las siguientes opciones:
+     *          a) Las reservas del cliente, en formato JSON.
+     *          b) Mensaje informando de que el cliente no tiene reservas, en formato JSON.
+     *          C) Mensaje informando de que no existe ningun cliente registrado con ese DNI, en formato JSON.
+     *          c) Mensaje de error de sistema, en formato JSON.
+     */
+    public orquestador.VerReservasClienteResponse verReservasCliente(orquestador.VerReservasCliente verReservasCliente)
+            throws ClassNotFoundException, IOException {
+        VerReservasClienteResponse verReservasClienteResponse = new VerReservasClienteResponse();
+        String dni = verReservasCliente.getDni();
+        int precio;
+        boolean vueloDirectoSalida;
+        boolean vueloDirectoRegreso;
+        String fechaSalida;
+        String fechaRegreso;
+        String origen;
+        String destino;
+        String codigoIATAOrigen;
+        String codigoIATADestino;
+        String aerolineaSalida;
+        String aerolineaRegreso;
+        ArrayList<ReservasClientes> reservasClientesArrayList = new ArrayList<>();
+
+        //Open connection
+        Connection  connection;
+        try {
+            connection = DriverManager.getConnection(url,user,password);
+
+            //language=MySQL
+            String sql = "{CALL verReservasCliente(?)}";
+            CallableStatement verReservas = connection.prepareCall(sql);
+            verReservas.setString(1,dni);
+            ResultSet resultSet = verReservas.executeQuery();
+            while (resultSet.next()){
+                precio = resultSet.getInt("precio");
+                vueloDirectoSalida = resultSet.getBoolean("vueloDirectoSalida");
+                vueloDirectoRegreso = resultSet.getBoolean("vueloDirectoRegreso");
+                fechaSalida = resultSet.getString("fechaSalida");
+                fechaRegreso = resultSet.getString("fechaRegreso");
+                origen = resultSet.getString("origen");
+                destino = resultSet.getString("destino");
+                codigoIATAOrigen = resultSet.getString("codigoIATAOrigen");
+                codigoIATADestino = resultSet.getString("codigoIATADestino");
+                aerolineaSalida = resultSet.getString("aerolineaSalida");
+                aerolineaRegreso = resultSet.getString("aerolineaRegreso");
+
+                ReservasClientes reservasClientes = new ReservasClientes(
+                        precio,
+                        vueloDirectoSalida,
+                        vueloDirectoRegreso,
+                        fechaSalida,
+                        fechaRegreso,
+                        origen,
+                        destino,
+                        codigoIATAOrigen,
+                        codigoIATADestino,
+                        aerolineaSalida,
+                        aerolineaRegreso);
+
+                reservasClientesArrayList.add(reservasClientes);
+            }
+            verReservas.close();
+            connection.close();
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+            String json = "{\n\"Reservas\": [";
+            for (int i = 0; i < reservasClientesArrayList.size(); i++) {
+                json = json + "\n" + mapper.writeValueAsString(reservasClientesArrayList.get(i));
+                if (i < reservasClientesArrayList.size() - 1) json = json + ",";
+            }
+            json = json + "]\n}";
+
+            verReservasClienteResponse.setReservasCliente(json);
+        } catch (SQLException e) {
+            int errorCode = e.getErrorCode();
+            if (errorCode == 1644){
+                verReservasClienteResponse.setReservasCliente(tratamientoErrores(e.getMessage()));
+            }else {
+                verReservasClienteResponse.setReservasCliente(
+                        tratamientoErrores("Error en el sistema al intentar ver sus reservas."));
+            }
+        }
+
+        reservasClientesArrayList.clear();
+
+        return verReservasClienteResponse;
+    }
+
+
+    /**
+     * Metodo que comprueba si existe un cliente o si la tupla(dni,password) no existe en la base de datos.
+     *
+     * @return:
+     *           true: si el cliente esta registrado en la base de datos [tupla(dni,password)]
+     *           false: si el cliente o bien no está registrado, o bien la tupla(dni,password)
+     *           no es correcta.
+     */
+    public orquestador.ComprobarClienteRegistradoResponse comprobarClienteRegistrado(
+            orquestador.ComprobarClienteRegistrado comprobarClienteRegistrado) throws SQLException {
+        ComprobarClienteRegistradoResponse comprobarClienteRegistradoResponse = new ComprobarClienteRegistradoResponse();
+        comprobarClienteRegistradoResponse.setConfirmacion(false);
+        String dni = comprobarClienteRegistrado.getDni();
+        String pass = comprobarClienteRegistrado.getPassword();
+
+        Connection connection = DriverManager.getConnection(url,user,password);
+
+        //language=MySQL
+        String sql = "{CALL comprobarRegistro(?,?)}";
+        CallableStatement comprobarRegistro = connection.prepareCall(sql);
+        comprobarRegistro.setString(1,dni);
+        comprobarRegistro.setString(2,pass);
+        ResultSet resultSet = comprobarRegistro.executeQuery();
+        while (resultSet.next()) comprobarClienteRegistradoResponse.setConfirmacion(true);
+
+        comprobarRegistro.close();
+        connection.close();
+
+        return comprobarClienteRegistradoResponse;
     }
 
     /**
@@ -129,14 +322,7 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
      * en funcion de la ciudad de origen, destino y fechas de
      * salida y de regreso.
      *
-     * @param obtenerOfertas
-     * @return
-     * @throws AxisFault
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     * @throws InterruptedException
      */
-
     public orquestador.ObtenerOfertasResponse obtenerOfertas(orquestador.ObtenerOfertas obtenerOfertas)
             throws AxisFault, SQLException, ClassNotFoundException, InterruptedException {
         ObtenerOfertasResponse obtenerOfertasResponse = new ObtenerOfertasResponse();
@@ -145,15 +331,12 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
         destino = obtenerOfertas.getCiudadDestino();
         String fechaSalida = obtenerOfertas.getFechaSalida();
         String fechaRegreso = obtenerOfertas.getFechaRegreso();
+        String dni = obtenerOfertas.getDni();
 
         int opcion = obtenerCodigosIATA();
         switch (opcion){
             case 1:
                 //uso de BBDD
-                //TODO ¿Borrar estos puntos de control o dejarlos para el catalina.out?
-                System.out.println("iataOrigenBBDD: " + iataOrigenBBDD);
-                System.out.println("iataDestinoBBDD: " + iataDestinoBBDD);
-
                 ServiceClient servicioVuelos = new ServiceClient();
                 Options opciones = new Options();
                 MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
@@ -169,11 +352,11 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
                 opciones.setTo(new EndpointReference("http://localhost:8080/axis2/services/Vuelos"));
                 opciones.setAction("urn:getInfoVuelos");
                 servicioVuelos.setOptions(opciones);
-
                 OMElement response = servicioVuelos.sendReceive(
                         createPayLoadVuelos(iataOrigenBBDD, iataDestinoBBDD, fechaSalida, fechaRegreso));
 
                 obtenerOfertasResponse.setOfertas(response.getFirstElement().getText());
+                insertarOfertas(response.getFirstElement().getText(),dni);
 
                 break;
             case 2:
@@ -195,10 +378,6 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
                                         destino+" no tiene aeropuertos."));
                         }
                     }else {
-                        //TODO ¿Borrar estos puntos de control o dejarlos para el catalina.out?
-                        System.out.println("iataOrigenCallBack: " + iataOrigenCallBack);
-                        System.out.println("iataDestinoCallBack: " + iataDestinoCallBack);
-
                         servicioVuelos = new ServiceClient();
                         opciones = new Options();
                         multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
@@ -219,6 +398,7 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
                                 createPayLoadVuelos(iataOrigenCallBack, iataDestinoCallBack, fechaSalida, fechaRegreso));
 
                         obtenerOfertasResponse.setOfertas(response.getFirstElement().getText());
+                        insertarOfertas(response.getFirstElement().getText(),dni);
                     }
                 }
                 break;
@@ -228,145 +408,170 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
     }
 
     /**
-     * Metodo que obtiene, si es que existe ya sea desde nuestra BBDD
-     * o desde el servicio web externo, los codigosIATA de las ciudades
-     * de origen y de destino.
+     * Método que recibe las ofertas en formato JSON y un dni y se encarga del parseo
+     * de la información.
      *
-     * @return
-     *          -> 1 si se ha usado la base de datos para obtener los codigos iata
-     *          -> 2 si se ha usado el servicio externo webservicesX.
-     *
-     * @throws AxisFault
-     * @throws ClassNotFoundException
-     * @throws SQLException
+     * @param ofertasJSON
+     * @param dni
      */
-    private static int obtenerCodigosIATA() throws AxisFault, ClassNotFoundException, SQLException, InterruptedException {
-        boolean origenExiste = false, destinoExiste = false;
 
-        ServiceClient servicioAeropuertos = new ServiceClient();
-        Options opciones = new Options();
-        MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
-        HttpConnectionManagerParams params = new HttpConnectionManagerParams();
-        params.setDefaultMaxConnectionsPerHost(20);
-        params.setMaxTotalConnections(20);
-        params.setSoTimeout(20000);
-        params.setConnectionTimeout(20000);
-        multiThreadedHttpConnectionManager.setParams(params);
-        HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
-        opciones.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
-        opciones.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-        opciones.setTo(new EndpointReference("http://localhost:8080/axis2/services/Aeropuertos"));
-        opciones.setAction("urn:getInfoAeropuerto");
-        servicioAeropuertos.setOptions(opciones);
-        servicioAeropuertos.sendReceiveNonBlocking(createPayLoadAeropuertos(origen,destino), new MyCallBack());
+    private static void insertarOfertas(String ofertasJSON, String dni){
+        int idOfertaVuelo;
+        int precio;
+        boolean vueloDirectoSalida;
+        boolean vueloDirectoRegreso;
+        String fechaSalida;
+        String fechaRegreso;
+        String origen;
+        String destino;
+        String codigoIATAOrigen;
+        String codigoIATADestino;
+        String aerolineaSalida;
+        String aerolineaRegreso;
 
-        // Register the JDBC driver:
-        Class.forName(JDBC_DRIVER);
+        JSONObject object = new JSONObject(ofertasJSON);
+        if (!object.has("ValidationErrors")){
+            Connection connection = null;
+            try {
+                connection = DriverManager.getConnection(url,user,password);
 
-        // Open connection:
-        Connection connection = DriverManager.getConnection(url,user,password);
+                //language=MySQL
+                String sql = "{CALL borrarOfertas(?)}";
+                CallableStatement borrarOfertas = connection.prepareCall(sql);
+                borrarOfertas.setString(1,dni);
+                borrarOfertas.executeQuery();
 
-        //Execute a CallableStatement:
-        //language=MySQL
-        String sql = "{CALL obtener_codigoIATA(?)}";
+                borrarOfertas.close();
+                connection.close();
 
-        CallableStatement callableStatement = connection.prepareCall(sql);
-        callableStatement.setString(1,origen);
-        ResultSet resultSet = callableStatement.executeQuery();
-        if (resultSet.next()){
-            origenExiste = true;
-            iataOrigenBBDD = resultSet.getString("codigoIATA");
-        }
+                JSONArray jsonArray = object.getJSONArray("Ofertas");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject objectAux = jsonArray.getJSONObject(i);
 
-        callableStatement.setString(1,destino);
-        resultSet = callableStatement.executeQuery();
-        if (resultSet.next()){
-            destinoExiste = true;
-            iataDestinoBBDD = resultSet.getString("codigoIATA");
-        }
+                    idOfertaVuelo = objectAux.getInt("idOferta");
+                    precio = objectAux.getInt("precio");
+                    vueloDirectoSalida = objectAux.getBoolean("vueloDirectoSalida");
+                    vueloDirectoRegreso = objectAux.getBoolean("vueloDirectoRegreso");
+                    fechaSalida = objectAux.getString("fechaSalida");
+                    fechaRegreso = objectAux.getString("fechaRegreso");
+                    origen = objectAux.getString("origenSalida");
+                    destino = objectAux.getString("destinoSalida");
+                    codigoIATAOrigen = objectAux.getString("iataCodeOrigenSalida");
+                    codigoIATADestino = objectAux.getString("iataCodeDestinoSalida");
+                    aerolineaSalida = objectAux.getString("aerolineaSalida");
+                    aerolineaRegreso = objectAux.getString("aerolineaRegreso");
 
-        // Clean the environment:
-        callableStatement.close();
-        connection.close();
-
-        if (destinoExiste && origenExiste){
-            return 1;
-        }else {
-            while (!fin) Thread.sleep(100);
-            return 2;
+                    insertarOfertaEnBBDD(dni,idOfertaVuelo,precio,vueloDirectoSalida,vueloDirectoRegreso,
+                            fechaSalida,fechaRegreso,origen,destino,codigoIATAOrigen,codigoIATADestino,
+                            aerolineaSalida,aerolineaRegreso);
+                }
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
-    public orquestador.ComprarBilleteResponse comprarBillete(orquestador.ComprarBillete comprarBillete) {
-        Logger.getRootLogger().setLevel(Level.OFF);
-        ComprarBilleteResponse comprarBilleteResponse = new ComprarBilleteResponse();
-        int id_oferta = comprarBillete.getId_oferta();
-        String dni = comprarBillete.getDni();
-        String token = comprarBillete.getToken();
-        String email = comprarBillete.getEmail();
-        String cuenta = comprarBillete.getCuenta();
-        String cuentaDestino = "12345678";
+    /**
+     * Método para insertar ofertas en la base de datos del orquestador.
+     *
+     */
+    private static void insertarOfertaEnBBDD(String dni,int idOfertaVuelo,int precio, boolean vueloDirectoSalida,
+                                             boolean vueloDirectoRegreso, String fechaSalida, String fechaRegreso,
+                                             String origen,String destino,String codigoIATAOrigen,
+                                             String codigoIATADestino, String aerolineaSalida, String aerolineaRegreso){
 
-        // TODO Comprobar en la cache del orquestador el importe del vuelo indicado
-        String importe = "1";
-
-        // Creamos mensaje SOAP:
-        ServiceClient sc = null;
+        Connection connection;
         try {
-            sc = new ServiceClient();
-        } catch (AxisFault e1) {
-            e1.printStackTrace();
+            connection = DriverManager.getConnection(url,user,password);
+
+            //language=MySQL
+            String sql = "{CALL insertarOferta(?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            CallableStatement insertarOfertas = connection.prepareCall(sql);
+            insertarOfertas.setString(1,dni);
+            insertarOfertas.setInt(2,idOfertaVuelo);
+            insertarOfertas.setInt(3,precio);
+            insertarOfertas.setBoolean(4,vueloDirectoSalida);
+            insertarOfertas.setBoolean(5,vueloDirectoRegreso);
+            insertarOfertas.setString(6,fechaSalida);
+            insertarOfertas.setString(7,fechaRegreso);
+            insertarOfertas.setString(8,origen);
+            insertarOfertas.setString(9,destino);
+            insertarOfertas.setString(10,codigoIATAOrigen);
+            insertarOfertas.setString(11,codigoIATADestino);
+            insertarOfertas.setString(12,aerolineaSalida);
+            insertarOfertas.setString(13,aerolineaRegreso);
+
+            insertarOfertas.executeQuery();
+
+            insertarOfertas.close();
+            connection.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
-        Options opts = new Options();
-        MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
-        HttpConnectionManagerParams params = new HttpConnectionManagerParams();
-        params.setDefaultMaxConnectionsPerHost(20);
-        params.setMaxTotalConnections(20);
-        params.setSoTimeout(20000);
-        params.setConnectionTimeout(20000);
-        multiThreadedHttpConnectionManager.setParams(params);
-        HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
-        opts.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
-        opts.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-        opts.setTo(new EndpointReference("http://localhost:8080/axis2/services/Banco"));
-        opts.setAction("urn:pagar");
-        sc.setOptions(opts);
-
-        // Anhadimos contenido del cuerpo:
-        OMFactory fac = OMAbstractFactory.getOMFactory();
-        OMNamespace omNs = fac.createOMNamespace("http://ws.apache.org/axis2", "ns4");
-        OMElement method = fac.createOMElement("pagar", omNs);
-        //Cabecera (cuenta y token)
-        OMElement header = fac.createOMElement("tokenCuenta", omNs);
-        header.setText(token+"-"+cuenta);
-        sc.addHeader(header);
-        // Importe
-        OMElement im = fac.createOMElement("importe", omNs);
-        im.setText(importe);
-        method.addChild(im);
-        // Cuenta origen
-        OMElement co = fac.createOMElement("cuentaOrigen", omNs);
-        co.setText(cuenta);
-        method.addChild(co);
-        // Cuenta destino
-        OMElement cd = fac.createOMElement("cuentaDestino", omNs);
-        cd.setText(cuentaDestino);
-        method.addChild(cd);
-        // Cuenta destino
-        OMElement des = fac.createOMElement("destinatario", omNs);
-        des.setText(email);
-        method.addChild(des);
-
-        try {
-            sc.sendRobust(method);
-        } catch (AxisFault e1) {
-            e1.printStackTrace();
-        }
-        comprarBilleteResponse.setCompra("Se ha enviado la informacion para realizar el pago, " +
-                "le llegara una confirmacion al email indicado.");
-
-        return comprarBilleteResponse;
     }
+
+    /**
+    * Metodo que obtiene, si es que existe ya sea desde nuestra BBDD
+    * o desde el servicio web externo, los codigosIATA de las ciudades
+    * de origen y de destino.
+    *
+    * @return
+    *          -> 1 si se ha usado la base de datos para obtener los codigos iata
+    *          -> 2 si se ha usado el servicio externo webservicesX.
+    */
+   private static int obtenerCodigosIATA() throws AxisFault, ClassNotFoundException, SQLException, InterruptedException {
+       boolean origenExiste = false, destinoExiste = false;
+
+       ServiceClient servicioAeropuertos = new ServiceClient();
+       Options opciones = new Options();
+       MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
+       HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+       params.setDefaultMaxConnectionsPerHost(20);
+       params.setMaxTotalConnections(20);
+       params.setSoTimeout(20000);
+       params.setConnectionTimeout(20000);
+       multiThreadedHttpConnectionManager.setParams(params);
+       HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
+       opciones.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
+       opciones.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
+       opciones.setTo(new EndpointReference("http://localhost:8080/axis2/services/Aeropuertos"));
+       opciones.setAction("urn:getInfoAeropuerto");
+       servicioAeropuertos.setOptions(opciones);
+       servicioAeropuertos.sendReceiveNonBlocking(createPayLoadAeropuertos(origen,destino), new MyCallBack());
+
+       // Open connection:
+       Connection connection = DriverManager.getConnection(url,user,password);
+
+       //Execute a CallableStatement:
+       //language=MySQL
+       String sql = "{CALL obtenerCodigoIATA(?)}";
+
+       CallableStatement callableStatement = connection.prepareCall(sql);
+       callableStatement.setString(1,origen);
+       ResultSet resultSet = callableStatement.executeQuery();
+       if (resultSet.next()){
+           origenExiste = true;
+           iataOrigenBBDD = resultSet.getString("codigoIATA");
+       }
+
+       callableStatement.setString(1,destino);
+       resultSet = callableStatement.executeQuery();
+       if (resultSet.next()){
+           destinoExiste = true;
+           iataDestinoBBDD = resultSet.getString("codigoIATA");
+       }
+
+       // Clean the environment:
+       callableStatement.close();
+       connection.close();
+
+       if (destinoExiste && origenExiste){
+           return 1;
+       }else {
+           while (!fin) Thread.sleep(100);
+           return 2;
+       }
+   }
 
     /**
      * Método usado para crear mensajes JSON de aviso de errores.
@@ -374,7 +579,6 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
      * @param mensaje
      * @return el error en formato JSON.
      */
-
     private static String tratamientoErrores(String mensaje){
         return "{\n" +
                 "  \"ValidationErrors\": [\n" +
@@ -424,7 +628,6 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
      * @param destino
      * @return
      */
-
     private static OMElement createPayLoadAeropuertos(String origen, String destino){
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMNamespace omNamespace = factory.createOMNamespace("http://Aeropuertos","ns");

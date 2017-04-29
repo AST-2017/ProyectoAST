@@ -18,36 +18,24 @@ public class ComprarBilleteResponse implements org.apache.axis2.databinding.ADBB
             "comprarBilleteResponse", "ns1");
 
     /**
-     * field for Compra
+     * field for Confirmacion
      */
-    protected java.lang.String localCompra;
-
-    /*  This tracker boolean wil be used to detect whether the user called the set method
-     *   for this attribute. It will be used to determine whether to include this field
-     *   in the serialized XML
-     */
-    protected boolean localCompraTracker = false;
-
-    public boolean isCompraSpecified() {
-        return localCompraTracker;
-    }
+    protected boolean localConfirmacion;
 
     /**
      * Auto generated getter method
-     * @return java.lang.String
+     * @return boolean
      */
-    public java.lang.String getCompra() {
-        return localCompra;
+    public boolean getConfirmacion() {
+        return localConfirmacion;
     }
 
     /**
      * Auto generated setter method
-     * @param param Compra
+     * @param param Confirmacion
      */
-    public void setCompra(java.lang.String param) {
-        localCompraTracker = true;
-
-        this.localCompra = param;
+    public void setConfirmacion(boolean param) {
+        this.localConfirmacion = param;
     }
 
     /**
@@ -66,15 +54,13 @@ public class ComprarBilleteResponse implements org.apache.axis2.databinding.ADBB
 
     public void serialize(final javax.xml.namespace.QName parentQName,
         javax.xml.stream.XMLStreamWriter xmlWriter)
-        throws javax.xml.stream.XMLStreamException,
-            org.apache.axis2.databinding.ADBException {
+        throws javax.xml.stream.XMLStreamException {
         serialize(parentQName, xmlWriter, false);
     }
 
     public void serialize(final javax.xml.namespace.QName parentQName,
         javax.xml.stream.XMLStreamWriter xmlWriter, boolean serializeType)
-        throws javax.xml.stream.XMLStreamException,
-            org.apache.axis2.databinding.ADBException {
+        throws javax.xml.stream.XMLStreamException {
         java.lang.String prefix = null;
         java.lang.String namespace = null;
 
@@ -99,21 +85,18 @@ public class ComprarBilleteResponse implements org.apache.axis2.databinding.ADBB
             }
         }
 
-        if (localCompraTracker) {
-            namespace = "http://Orquestador";
-            writeStartElement(null, namespace, "compra", xmlWriter);
+        namespace = "http://Orquestador";
+        writeStartElement(null, namespace, "confirmacion", xmlWriter);
 
-            if (localCompra == null) {
-                // write the nil attribute
-                writeAttribute("xsi",
-                    "http://www.w3.org/2001/XMLSchema-instance", "nil", "1",
-                    xmlWriter);
-            } else {
-                xmlWriter.writeCharacters(localCompra);
-            }
-
-            xmlWriter.writeEndElement();
+        if (false) {
+            throw new org.apache.axis2.databinding.ADBException(
+                "confirmacion cannot be null!!");
+        } else {
+            xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                    localConfirmacion));
         }
+
+        xmlWriter.writeEndElement();
 
         xmlWriter.writeEndElement();
     }
@@ -389,26 +372,31 @@ public class ComprarBilleteResponse implements org.apache.axis2.databinding.ADBB
 
                 if ((reader.isStartElement() &&
                         new javax.xml.namespace.QName("http://Orquestador",
-                            "compra").equals(reader.getName())) ||
-                        new javax.xml.namespace.QName("", "compra").equals(
+                            "confirmacion").equals(reader.getName())) ||
+                        new javax.xml.namespace.QName("", "confirmacion").equals(
                             reader.getName())) {
                     nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
                             "nil");
 
-                    if (!"true".equals(nillableValue) &&
-                            !"1".equals(nillableValue)) {
-                        java.lang.String content = reader.getElementText();
-
-                        object.setCompra(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
-                                content));
-                    } else {
-                        reader.getElementText(); // throw away text nodes if any.
+                    if ("true".equals(nillableValue) ||
+                            "1".equals(nillableValue)) {
+                        throw new org.apache.axis2.databinding.ADBException(
+                            "The element: " + "confirmacion" +
+                            "  cannot be null");
                     }
+
+                    java.lang.String content = reader.getElementText();
+
+                    object.setConfirmacion(org.apache.axis2.databinding.utils.ConverterUtil.convertToBoolean(
+                            content));
 
                     reader.next();
                 } // End of if for expected property start element
 
                 else {
+                    // 1 - A start element we are not expecting indicates an invalid parameter was passed
+                    throw new org.apache.axis2.databinding.ADBException(
+                        "Unexpected subelement " + reader.getName());
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())

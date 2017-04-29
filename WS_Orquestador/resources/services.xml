@@ -2,16 +2,28 @@
 <!-- This file was auto-generated from WSDL -->
 <!-- by the Apache Axis2 version: 1.7.4  Built on : Oct 21, 2016 (10:47:34 BST) -->
 <serviceGroup>
-    <service name="Orquestador" class="orquestador.OrquestadorSkeleton">
+    <service name="Orquestador">
         <messageReceivers>
             <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="orquestador.OrquestadorMessageReceiverInOut"/>
         </messageReceivers>
         <parameter name="ServiceClass">orquestador.OrquestadorSkeleton</parameter>
         <parameter name="useOriginalwsdl">true</parameter>
         <parameter name="modifyUserWSDLPortAddress">true</parameter>
+        <operation name="registrarCliente" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://Orquestador">
+            <actionMapping>urn:registrarCliente</actionMapping>
+            <outputActionMapping>urn:registrarClienteResponse</outputActionMapping>
+        </operation>
         <operation name="comprarBillete" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://Orquestador">
             <actionMapping>urn:comprarBillete</actionMapping>
             <outputActionMapping>urn:comprarBilleteResponse</outputActionMapping>
+        </operation>
+        <operation name="verReservasCliente" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://Orquestador">
+            <actionMapping>urn:verReservasCliente</actionMapping>
+            <outputActionMapping>urn:verReservasClienteResponse</outputActionMapping>
+        </operation>
+        <operation name="comprobarClienteRegistrado" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://Orquestador">
+            <actionMapping>urn:comprobarClienteRegistrado</actionMapping>
+            <outputActionMapping>urn:comprobarClienteRegistradoResponse</outputActionMapping>
         </operation>
         <operation name="obtenerOfertas" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://Orquestador">
             <actionMapping>urn:obtenerOfertas</actionMapping>

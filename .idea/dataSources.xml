@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="cache_iata@localhost" uuid="2c9fd9f3-b745-47ec-a465-f5fd083d2775">
+    <data-source source="LOCAL" name="orquestadorBBDD@localhost" uuid="f4ad0b96-964f-4768-9e67-7fdb55e458ae">
       <driver-ref>mysql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/cache_iata</jdbc-url>
+      <jdbc-url>jdbc:mysql://localhost:3306/orquestadorBBDD</jdbc-url>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />
