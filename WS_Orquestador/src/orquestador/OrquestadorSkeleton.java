@@ -38,6 +38,7 @@ public class OrquestadorSkeleton {
 
     // JDBC nombre del driver y url de la base de datos
     private static final String url = "jdbc:mysql://localhost:3306/orquestadorBBDD?useSSL=false";
+    private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 
     // Credenciales para la base de datos
     private static final String user = "ast";
@@ -67,6 +68,9 @@ public class OrquestadorSkeleton {
                 iataOrigenCallBack = arrayAerOrig.get(0).toString();
                 iataDestinoCallBack = arrayAerDest.get(0).toString();
                 try {
+                    // Register JDBC driver
+                    Class.forName(JDBC_DRIVER);
+
                     //Open connection
                     Connection  connection = DriverManager.getConnection(url,user,password);
 
@@ -86,6 +90,8 @@ public class OrquestadorSkeleton {
                     connection.close();
 
                 } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }else{
@@ -114,10 +120,12 @@ public class OrquestadorSkeleton {
         int telefono = Integer.parseInt(registrarCliente.getTelefono());
         String pass = registrarCliente.getPassword();
 
-        // Register JDBC driver and Open connection
-        Connection  connection = null;
         try {
-            connection = DriverManager.getConnection(url,user,password);
+            // Register JDBC driver
+            Class.forName(JDBC_DRIVER);
+
+            // Open connection.
+            Connection connection = DriverManager.getConnection(url,user,password);
 
             //language=MySQL
             String sql = "{CALL insertarCliente(?,?,?,?,?,?,?)}";
@@ -159,9 +167,12 @@ public class OrquestadorSkeleton {
         String cuentaDestino = "12345678";
         int importe = 0;
 
-        Connection connection = null;
         try {
-            connection = DriverManager.getConnection(url,user,password);
+            // Register JDBC driver
+            Class.forName(JDBC_DRIVER);
+
+            // Open connection.
+            Connection connection = DriverManager.getConnection(url,user,password);
 
             //obtener el precio, para enviar mensaje a Banco.
             //language=MySQL
@@ -188,6 +199,8 @@ public class OrquestadorSkeleton {
             connection.close();
         }catch (SQLException e){
             System.out.println(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
         return comprarBilleteResponse;
@@ -219,10 +232,12 @@ public class OrquestadorSkeleton {
         String aerolineaRegreso;
         ArrayList<ReservasClientes> reservasClientesArrayList = new ArrayList<>();
 
-        //Open connection
-        Connection  connection;
         try {
-            connection = DriverManager.getConnection(url,user,password);
+            // Register JDBC driver
+            Class.forName(JDBC_DRIVER);
+
+            // Open connection.
+            Connection connection = DriverManager.getConnection(url,user,password);
 
             //language=MySQL
             String sql = "{CALL verReservasCliente(?)}";
@@ -295,12 +310,16 @@ public class OrquestadorSkeleton {
      *           no es correcta.
      */
     public orquestador.ComprobarClienteRegistradoResponse comprobarClienteRegistrado(
-            orquestador.ComprobarClienteRegistrado comprobarClienteRegistrado) throws SQLException {
+            orquestador.ComprobarClienteRegistrado comprobarClienteRegistrado) throws SQLException, ClassNotFoundException {
         ComprobarClienteRegistradoResponse comprobarClienteRegistradoResponse = new ComprobarClienteRegistradoResponse();
         comprobarClienteRegistradoResponse.setConfirmacion(false);
         String dni = comprobarClienteRegistrado.getDni();
         String pass = comprobarClienteRegistrado.getPassword();
 
+        // Register JDBC driver
+        Class.forName(JDBC_DRIVER);
+
+        // Open connection
         Connection connection = DriverManager.getConnection(url,user,password);
 
         //language=MySQL
@@ -431,9 +450,12 @@ public class OrquestadorSkeleton {
 
         JSONObject object = new JSONObject(ofertasJSON);
         if (!object.has("ValidationErrors")){
-            Connection connection = null;
             try {
-                connection = DriverManager.getConnection(url,user,password);
+                // Register JDBC driver
+                Class.forName(JDBC_DRIVER);
+
+                //Open connection
+                Connection connection = DriverManager.getConnection(url,user,password);
 
                 //language=MySQL
                 String sql = "{CALL borrarOfertas(?)}";
@@ -467,6 +489,8 @@ public class OrquestadorSkeleton {
                 }
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -480,9 +504,12 @@ public class OrquestadorSkeleton {
                                              String origen,String destino,String codigoIATAOrigen,
                                              String codigoIATADestino, String aerolineaSalida, String aerolineaRegreso){
 
-        Connection connection;
         try {
-            connection = DriverManager.getConnection(url,user,password);
+            // Register JDBC driver
+            Class.forName(JDBC_DRIVER);
+
+            //Open connection
+            Connection connection = DriverManager.getConnection(url,user,password);
 
             //language=MySQL
             String sql = "{CALL insertarOferta(?,?,?,?,?,?,?,?,?,?,?,?,?)}";
@@ -507,6 +534,8 @@ public class OrquestadorSkeleton {
             connection.close();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
@@ -538,6 +567,9 @@ public class OrquestadorSkeleton {
        opciones.setAction("urn:getInfoAeropuerto");
        servicioAeropuertos.setOptions(opciones);
        servicioAeropuertos.sendReceiveNonBlocking(createPayLoadAeropuertos(origen,destino), new MyCallBack());
+
+       // Register JDBC driver
+       Class.forName(JDBC_DRIVER);
 
        // Open connection:
        Connection connection = DriverManager.getConnection(url,user,password);
