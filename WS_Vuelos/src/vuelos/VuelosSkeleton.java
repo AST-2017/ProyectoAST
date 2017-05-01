@@ -7,6 +7,9 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+
+import javax.jws.WebMethod;
+import javax.jws.WebService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,9 +32,9 @@ import java.util.ArrayList;
  * vuelos que SkyScanner no tiene. Posteriormente devevolvera la
  * respuesta de toda la informacion  usando SOAP, dentro de la
  * etiqueta vuelos utilizando JSON.
- */
-
-/**
+ *
+ *
+ *
  * Tratamiento de errores:
  *
  * Los errores, ya sea por algun parámetro incorrecto, por
@@ -39,7 +42,8 @@ import java.util.ArrayList;
  * para las fechas seleccionadas, se les notificara al Cliente, por
  * medio también de un mensaje JSON.
  */
-
+@SuppressWarnings("Duplicates")
+@WebService
 public class VuelosSkeleton {
     private static ArrayList<Salidas> salidasArrayList = new ArrayList<>();
     private static ArrayList<Regresos> regresosArrayList = new ArrayList<>();
@@ -51,9 +55,9 @@ public class VuelosSkeleton {
      * la consulta en formato JSON, se alamcena en la etiqueta
      * <vuelos></vuelos> del mensaje SOAP de respuesta.
      *
-     * @param getInfoVuelos
      * @return getInfoVuelosResponse
      */
+    @WebMethod
     public vuelos.GetInfoVuelosResponse getInfoVuelos(vuelos.GetInfoVuelos getInfoVuelos) throws IOException, JSONException {
         GetInfoVuelosResponse getInfoVuelosResponse = new GetInfoVuelosResponse();
         String originAirport = getInfoVuelos.getOriginAirport();
@@ -122,9 +126,8 @@ public class VuelosSkeleton {
      *
      * @param responseSkyScanner respuesta de SkyScanner.
      * @return respuesta al Orquestador en JSON.
-     * @throws JSONException
-     * @throws IOException
-     * @implNote: si SkyScanner no devueve en la respuesta ninguna
+     *
+     * Si SkyScanner no devueve en la respuesta ninguna
      * salida o ninguna llegada, solo tomaremos como valida la
      * parte conjunta salidaEntrada.
      * <p>
@@ -208,7 +211,6 @@ public class VuelosSkeleton {
      *
      * @param object la respuesta JSON completa.
      * @param quote  la parte de presupuestos de la respuesta JSON
-     * @throws JSONException
      */
 
     private static void salidas(JSONObject object, JSONObject quote) throws JSONException {
@@ -247,7 +249,6 @@ public class VuelosSkeleton {
      *
      * @param object la respuesta JSON completa.
      * @param quote  la parte de presupuestos de la respuesta JSON
-     * @throws JSONException
      */
 
     private static void regresos(JSONObject object, JSONObject quote) throws JSONException {
@@ -286,7 +287,6 @@ public class VuelosSkeleton {
      *
      * @param object la respuesta JSON completa.
      * @param quote  la parte de presupuestos de la respuesta JSON
-     * @throws JSONException
      */
 
     private static void salidasRegresos(JSONObject object, JSONObject quote) throws JSONException {
@@ -349,7 +349,7 @@ public class VuelosSkeleton {
      *
      * @param object   necesario el documento JSON completo
      * @param idCiudad identificador, para encontrar la ciudad y codigo iata.
-     * @return(NombreCiudad,iataCode)
+     * @return (NombreCiudad,iataCode)
      */
     private static String[] getInfoCiudad(JSONObject object, int idCiudad) throws JSONException {
         JSONArray array = object.getJSONArray("Places");
@@ -371,7 +371,7 @@ public class VuelosSkeleton {
      *
      * @param object    necesario el documento JSON completo
      * @param carrierID identificador, para encontrar la aerolinea
-     * @return(nombre aerolinea)
+     * @return (nombre aerolinea)
      */
 
     private static String getCarrier(JSONObject object, int carrierID) throws JSONException {

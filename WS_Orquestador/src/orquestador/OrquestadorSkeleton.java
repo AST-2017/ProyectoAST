@@ -21,13 +21,17 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.jws.WebMethod;
+import javax.jws.WebService;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 
+@SuppressWarnings("Duplicates")
+@WebService
 public class OrquestadorSkeleton {
     private static boolean fin = false;
-    private static boolean onFault = false, onError = false, onComplete = false;
+    private static boolean onFault = false, onError = false;
     private static String jsonRespAeropuertos = "";
     private static String origen = "";
     private static String destino = "";
@@ -57,7 +61,6 @@ public class OrquestadorSkeleton {
             onError = true;
         }
         public void onComplete() {
-            onComplete = true;
             JSONObject responseAerop = new JSONObject(jsonRespAeropuertos);
             JSONObject aerOrig = responseAerop.getJSONObject("AeropuertosOrigen");
             JSONObject aerDest = responseAerop.getJSONObject("AeropuertosDestino");
@@ -89,17 +92,27 @@ public class OrquestadorSkeleton {
                     introducirIata.close();
                     connection.close();
 
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
+                } catch (SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-            }else{
-                if (arrayAerOrig.length() > 0) iataOrigenCallBack = arrayAerOrig.get(0).toString();
-                if (arrayAerDest.length() > 0) iataDestinoCallBack = arrayAerDest.get(0).toString();
             }
+            if (arrayAerOrig.length() > 0) iataOrigenCallBack = arrayAerOrig.get(0).toString();
+            if (arrayAerDest.length() > 0) iataDestinoCallBack = arrayAerDest.get(0).toString();
             fin = true;
         }
+    }
+
+    private static void limpiarVariables(){
+        fin = false;
+        onFault = false;
+        onError = false;
+        jsonRespAeropuertos = "";
+        origen = "";
+        destino = "";
+        iataOrigenBBDD = null;
+        iataDestinoBBDD = null;
+        iataOrigenCallBack = null;
+        iataDestinoCallBack = null;
     }
 
     /**
@@ -108,8 +121,10 @@ public class OrquestadorSkeleton {
      * @return true: si el registro se ha realizado de forma satisfactoria.
      *         false: si ya existe un usuario con ese nombre en el sistema.
      */
+    @WebMethod
     public orquestador.RegistrarClienteResponse registrarCliente(orquestador.RegistrarCliente registrarCliente)
             throws ClassNotFoundException, SQLException {
+        limpiarVariables();
         RegistrarClienteResponse registrarClienteResponse = new RegistrarClienteResponse();
         registrarClienteResponse.setConfirmacion(false);
         String nombre = registrarCliente.getNombre();
@@ -154,10 +169,10 @@ public class OrquestadorSkeleton {
     /**
      * Método para comprarBillete.
      *
-     * @return
+     * @return booleano
      */
     public orquestador.ComprarBilleteResponse comprarBillete(orquestador.ComprarBillete comprarBillete) {
-        Logger.getRootLogger().setLevel(Level.OFF);
+        limpiarVariables();
         ComprarBilleteResponse comprarBilleteResponse = new ComprarBilleteResponse();
         int id_oferta = comprarBillete.getId_oferta();
         String dni = comprarBillete.getDni();
@@ -215,8 +230,10 @@ public class OrquestadorSkeleton {
      *          C) Mensaje informando de que no existe ningun cliente registrado con ese DNI, en formato JSON.
      *          c) Mensaje de error de sistema, en formato JSON.
      */
+    @WebMethod
     public orquestador.VerReservasClienteResponse verReservasCliente(orquestador.VerReservasCliente verReservasCliente)
             throws ClassNotFoundException, IOException {
+        limpiarVariables();
         VerReservasClienteResponse verReservasClienteResponse = new VerReservasClienteResponse();
         String dni = verReservasCliente.getDni();
         int precio;
@@ -309,8 +326,10 @@ public class OrquestadorSkeleton {
      *           false: si el cliente o bien no está registrado, o bien la tupla(dni,password)
      *           no es correcta.
      */
+    @WebMethod
     public orquestador.ComprobarClienteRegistradoResponse comprobarClienteRegistrado(
             orquestador.ComprobarClienteRegistrado comprobarClienteRegistrado) throws SQLException, ClassNotFoundException {
+        limpiarVariables();
         ComprobarClienteRegistradoResponse comprobarClienteRegistradoResponse = new ComprobarClienteRegistradoResponse();
         comprobarClienteRegistradoResponse.setConfirmacion(false);
         String dni = comprobarClienteRegistrado.getDni();
@@ -342,8 +361,10 @@ public class OrquestadorSkeleton {
      * salida y de regreso.
      *
      */
+    @WebMethod
     public orquestador.ObtenerOfertasResponse obtenerOfertas(orquestador.ObtenerOfertas obtenerOfertas)
             throws AxisFault, SQLException, ClassNotFoundException, InterruptedException {
+        limpiarVariables();
         ObtenerOfertasResponse obtenerOfertasResponse = new ObtenerOfertasResponse();
         Logger.getRootLogger().setLevel(Level.OFF);
         origen = obtenerOfertas.getCiudadOrigen();
@@ -429,9 +450,6 @@ public class OrquestadorSkeleton {
     /**
      * Método que recibe las ofertas en formato JSON y un dni y se encarga del parseo
      * de la información.
-     *
-     * @param ofertasJSON
-     * @param dni
      */
 
     private static void insertarOfertas(String ofertasJSON, String dni){
@@ -608,7 +626,7 @@ public class OrquestadorSkeleton {
     /**
      * Método usado para crear mensajes JSON de aviso de errores.
      *
-     * @param mensaje
+     * @param mensaje mensaje de error personalizaco.
      * @return el error en formato JSON.
      */
     private static String tratamientoErrores(String mensaje){
@@ -625,11 +643,7 @@ public class OrquestadorSkeleton {
      * Metodo usado para la creacion del cuerpo de carga para
      * contactar con el WS_Vuelos
      *
-     * @param aeropuertosOrigen
-     * @param aeropuertosDestino
-     * @param fechaSalida
-     * @param fechaRegreso
-     * @return
+     * @return el cuerpo del mensaje SOAP
      */
     private static OMElement createPayLoadVuelos(String aeropuertosOrigen, String aeropuertosDestino,
                                                  String fechaSalida, String fechaRegreso){
@@ -656,9 +670,7 @@ public class OrquestadorSkeleton {
      * Metodo usado para la creacion del cuerpo de carga para
      * contactar con el WS_Aeropuertos.
      *
-     * @param origen
-     * @param destino
-     * @return
+     * @return el cuerpo del mensaje SOAP
      */
     private static OMElement createPayLoadAeropuertos(String origen, String destino){
         OMFactory factory = OMAbstractFactory.getOMFactory();

@@ -17,6 +17,9 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
+
+import javax.jws.WebMethod;
+import javax.jws.WebService;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -25,7 +28,8 @@ import java.util.TreeSet;
  * y devolver los aeropuertos de dichas ciudades en una
  * respuesta SOAP con cuerpo de respuesta JSON.
  */
-
+@SuppressWarnings("Duplicates")
+@WebService
 public class AeropuertosSkeleton {
     private static TreeSet<String> aeropuertosOrigen = new TreeSet<>();
     private static TreeSet<String> aeropuertosDestino = new TreeSet<>();
@@ -34,9 +38,9 @@ public class AeropuertosSkeleton {
      * Se van a redefinir los nombres de algunas ciudades
      * por problemas de compatiblidad con WebServicesX.
      *
-     * @param getInfoAeropuerto
      * @return getInfoAeropuertoResponse
      */
+    @WebMethod
     public aeropuertos.GetInfoAeropuertoResponse getInfoAeropuerto(aeropuertos.GetInfoAeropuerto getInfoAeropuerto) throws AxisFault {
         Logger.getRootLogger().setLevel(Level.OFF);
         GetInfoAeropuertoResponse getInfoAeropuertoResponse = new GetInfoAeropuertoResponse();
@@ -97,10 +101,6 @@ public class AeropuertosSkeleton {
      * Método que parsea la respuesta del servicio SOAP externo a los aeropuertos
      * de interés para nuestro servicio y crea la respuesta para el orquestador
      * en formato JSON.
-     *
-     * @param res
-     * @param ciudadOrigen
-     * @param ciudadDestino
      *
      * @return los aeropuertos de la ciudad de origen y la ciudad de destino
      * en formato JSON.
