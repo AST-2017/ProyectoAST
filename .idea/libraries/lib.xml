@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="lib">
     <CLASSES>
-      <root url="file://$USER_HOME$/juddi/juddi-tomcat-3.3.3/webapps/axis2/WEB-INF/lib" />
+      <root url="file://$USER_HOME$/Tomcat/webapps/axis2/WEB-INF/lib" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="file://$USER_HOME$/juddi/juddi-tomcat-3.3.3/webapps/axis2/WEB-INF/lib" />
+      <root url="file://$USER_HOME$/Tomcat/webapps/axis2/WEB-INF/lib" />
     </SOURCES>
-    <jarDirectory url="file://$USER_HOME$/juddi/juddi-tomcat-3.3.3/webapps/axis2/WEB-INF/lib" recursive="false" />
-    <jarDirectory url="file://$USER_HOME$/juddi/juddi-tomcat-3.3.3/webapps/axis2/WEB-INF/lib" recursive="false" type="SOURCES" />
+    <jarDirectory url="file://$USER_HOME$/Tomcat/webapps/axis2/WEB-INF/lib" recursive="false" />
+    <jarDirectory url="file://$USER_HOME$/Tomcat/webapps/axis2/WEB-INF/lib" recursive="false" type="SOURCES" />
   </library>
 </component>

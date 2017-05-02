@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Cliente/Cliente.iml" filepath="$PROJECT_DIR$/Cliente/Cliente.iml" />
       <module fileurl="file://$PROJECT_DIR$/WS_Aeropuertos/WS_Aeropuertos.iml" filepath="$PROJECT_DIR$/WS_Aeropuertos/WS_Aeropuertos.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WS_Banco/WS_Banco.iml" filepath="$PROJECT_DIR$/WS_Banco/WS_Banco.iml" />
       <module fileurl="file://$PROJECT_DIR$/WS_Orquestador/WS_Orquestador.iml" filepath="$PROJECT_DIR$/WS_Orquestador/WS_Orquestador.iml" />
       <module fileurl="file://$PROJECT_DIR$/WS_Vuelos/WS_Vuelos.iml" filepath="$PROJECT_DIR$/WS_Vuelos/WS_Vuelos.iml" />
     </modules>
