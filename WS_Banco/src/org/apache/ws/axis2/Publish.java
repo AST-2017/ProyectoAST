@@ -9,7 +9,6 @@ import org.uddi.api_v3.*;
 import org.uddi.v3_service.UDDIInquiryPortType;
 import org.uddi.v3_service.UDDISecurityPortType;
 
-import java.io.File;
 import java.util.List;
 
 public class Publish {
@@ -260,7 +259,7 @@ public class Publish {
 		try {
 
 			// Create a client and read config file (uddi.xml)
-			UDDIClient uddiClient = new UDDIClient("C:"+File.separator + "/Users/ruben/Tomcat/uddi/uddi.xml");
+			UDDIClient uddiClient = new UDDIClient("/Users/ruben/Tomcat/uddi/uddi.xml");
 
 			clerk = uddiClient.getClerk("default");
 

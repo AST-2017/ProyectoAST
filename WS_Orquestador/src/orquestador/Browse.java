@@ -48,7 +48,7 @@ public class Browse {
 		try {
 
 			// Create a client and read config file (uddi.xml)
-			UDDIClient client = new UDDIClient("uddi.xml");
+			UDDIClient client = new UDDIClient("/Users/ruben/Tomcat/uddi/uddi.xml");
 			// A UDDIClient can be a client to multiple UDDI nodes, so supply the nodeName (defined in your uddi.xml).
 
 			// The transport can be WS, inVM, RMI etc which is defined in the uddi.xml

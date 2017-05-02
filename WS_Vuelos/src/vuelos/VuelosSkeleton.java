@@ -1,5 +1,8 @@
 package vuelos;
 
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.engine.ServiceLifeCycle;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -16,10 +19,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.engine.ServiceLifeCycle;
 
 /**
  * VuelosSkeleton java skeleton for the axisService
@@ -53,11 +52,11 @@ public class VuelosSkeleton implements ServiceLifeCycle{
     private static ArrayList<Regresos> regresosArrayList = new ArrayList<>();
     private static ArrayList<SalidasRegresos> salidasRegresosArrayList = new ArrayList<>();
     private static Publish sp = new Publish();
-    private static String servicio = "Vuelos";
-    private static String endpoint = "http://localhost:8081/axis2/services/Vuelos";
 
     public void startUp(ConfigurationContext context, AxisService service) {
-      sp.publish(servicio,endpoint);
+        String servicio = "Vuelos";
+        String endpoint = "http://192.168.43.199:8081/axis2/services/Vuelos";
+        sp.publish(servicio, endpoint);
     }
 
     public void shutDown(ConfigurationContext context, AxisService service) {

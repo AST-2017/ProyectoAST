@@ -6,17 +6,11 @@
  */
 package org.apache.ws.axis2;
 
-import java.io.File;
-import java.io.IOException;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.ServiceLifeCycle;
+
+import java.sql.*;
 
 /**
  *  BancoSkeleton java skeleton for the axisService
@@ -26,11 +20,11 @@ public class BancoSkeleton implements ServiceLifeCycle{
 	private final static String contra = "ast";
 	private final static String bd = "banco";
   private final static Publish sp = new Publish();
-  private static String servicio = "Banco";
-  private static String endpoint = "http://localhost:8081/axis2/services/Banco";
 
   public void startUp(ConfigurationContext context, AxisService service) {
-    sp.publish(servicio,endpoint);
+    String servicio = "Banco";
+    String endpoint = "http://192.168.43.199:8081/axis2/services/Banco";
+    sp.publish(servicio, endpoint);
   }
 
   public void shutDown(ConfigurationContext context, AxisService service) {

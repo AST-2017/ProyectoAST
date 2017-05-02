@@ -59,7 +59,7 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
 
     public void startUp(ConfigurationContext context, AxisService service) {
         String servicio = "Orquestador";
-        String endpointOrquestador = "http://localhost:8081/axis2/services/Orquestador";
+        String endpointOrquestador = "http://192.168.43.199:8081/axis2/services/Orquestador";
         sp.publish(servicio, endpointOrquestador);
     }
 
