@@ -9,6 +9,9 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.engine.ServiceLifeCycle;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
@@ -30,9 +33,20 @@ import java.util.TreeSet;
  */
 @SuppressWarnings("Duplicates")
 @WebService
-public class AeropuertosSkeleton {
+public class AeropuertosSkeleton implements ServiceLifeCycle{
     private static TreeSet<String> aeropuertosOrigen = new TreeSet<>();
     private static TreeSet<String> aeropuertosDestino = new TreeSet<>();
+    private static Publish sp = new Publish();
+    private static String servicio = "Aeropuertos";
+    private static String endpoint = "http://localhost:8081/axis2/services/Aeropuertos";
+
+    public void startUp(ConfigurationContext context, AxisService service) {
+      sp.publish(servicio,endpoint);
+    }
+
+    public void shutDown(ConfigurationContext context, AxisService service) {
+      sp.unpublish();
+    }
 
     /**
      * Se van a redefinir los nombres de algunas ciudades

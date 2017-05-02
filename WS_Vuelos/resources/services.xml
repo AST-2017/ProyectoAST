@@ -2,7 +2,7 @@
 <!-- This file was auto-generated from WSDL -->
 <!-- by the Apache Axis2 version: 1.7.4  Built on : Oct 21, 2016 (10:47:34 BST) -->
 <serviceGroup>
-    <service name="Vuelos">
+    <service name="Vuelos" class="vuelos.VuelosSkeleton">
         <messageReceivers>
             <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="vuelos.VuelosMessageReceiverInOut"/>
         </messageReceivers>

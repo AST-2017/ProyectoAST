@@ -9,7 +9,10 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.client.async.AxisCallback;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.engine.ServiceLifeCycle;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -29,7 +32,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings("Duplicates")
 @WebService
-public class OrquestadorSkeleton {
+public class OrquestadorSkeleton implements ServiceLifeCycle{
     private static boolean fin = false;
     private static boolean onFault = false, onError = false;
     private static String jsonRespAeropuertos = "";
@@ -47,6 +50,22 @@ public class OrquestadorSkeleton {
     // Credenciales para la base de datos
     private static final String user = "ast";
     private static final String password = "ast";
+
+    //Publicar en juddi
+    private static Publish sp = new Publish();
+
+    //Buscar en juddi
+    private static Browse browse = new Browse();
+
+    public void startUp(ConfigurationContext context, AxisService service) {
+        String servicio = "Orquestador";
+        String endpointOrquestador = "http://localhost:8081/axis2/services/Orquestador";
+        sp.publish(servicio, endpointOrquestador);
+    }
+
+    public void shutDown(ConfigurationContext context, AxisService service) {
+      sp.unpublish();
+    }
 
     //Llamada asincrona.
     public static class MyCallBack implements  AxisCallback{
@@ -171,16 +190,20 @@ public class OrquestadorSkeleton {
      *
      * @return booleano
      */
-    public orquestador.ComprarBilleteResponse comprarBillete(orquestador.ComprarBillete comprarBillete) {
+    @WebMethod
+    public orquestador.ComprarBilleteResponse comprarBillete(orquestador.ComprarBillete comprarBillete) throws AxisFault{
         limpiarVariables();
         ComprarBilleteResponse comprarBilleteResponse = new ComprarBilleteResponse();
+        comprarBilleteResponse.setConfirmacion(false);
         int id_oferta = comprarBillete.getId_oferta();
         String dni = comprarBillete.getDni();
         String iban = comprarBillete.getIban();
         //TODO token.
-        String token = "123456";
+        String token = "qwerty";
+        String email = null;
         String cuentaDestino = "12345678";
         int importe = 0;
+        String endpointBanco = browse.browseService("Banco");
 
         try {
             // Register JDBC driver
@@ -198,25 +221,59 @@ public class OrquestadorSkeleton {
             ResultSet resultSet = obtenerPrecioOferta.executeQuery();
             while (resultSet.next()) importe = resultSet.getInt("precio");
             obtenerPrecioOferta.close();
-
+            
+            sql = "{CALL obtenerEmail(?)}";
+            CallableStatement obtenerEmail = connection.prepareCall(sql);
+            obtenerEmail.setString(1,dni);
+            resultSet = obtenerEmail.executeQuery();
+            while (resultSet.next()) email = resultSet.getString("email");
+            obtenerEmail.close();
 
             //TODO insertar aquí la comunicación y posterior respuesta del servicio Banco.
+            ServiceClient servicioVuelos = new ServiceClient();
+            Options opciones = new Options();
+            MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
+            HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+            params.setDefaultMaxConnectionsPerHost(20);
+            params.setMaxTotalConnections(20);
+            params.setSoTimeout(20000);
+            params.setConnectionTimeout(20000);
+            multiThreadedHttpConnectionManager.setParams(params);
+            HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
+            opciones.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
+            opciones.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
+            opciones.setTo(new EndpointReference(endpointBanco));
+            opciones.setAction("urn:pagar");
+            servicioVuelos.setOptions(opciones);
 
-            //insertar reserva en base de datos.
-            //language=MySQL
-            sql = "{CALL insertarReserva(?,?)}";
-            CallableStatement insertarReserva = connection.prepareCall(sql);
-            insertarReserva.setString(1,dni);
-            insertarReserva.setInt(2,id_oferta);
-            insertarReserva.executeQuery();
+            //Cabecera (cuenta y token)
+            OMFactory fac = OMAbstractFactory.getOMFactory();
+            OMNamespace omNs = fac.createOMNamespace("http://ws.apache.org/axis2", "ns");
+            OMElement header = fac.createOMElement("tokenCuenta", omNs);
+            header.setText(token+"-"+iban);
+            servicioVuelos.addHeader(header);
 
-            insertarReserva.close();
-            connection.close();
-        }catch (SQLException e){
-            System.out.println(e.getMessage());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+            OMElement response = servicioVuelos.sendReceive(createPayLoadBanco(String.valueOf(importe),iban,cuentaDestino,email));
+
+            // Si el pago se realizo correctamente
+            if(Boolean.valueOf(response.getFirstElement().getText())){
+              //insertar reserva en base de datos.
+              //language=MySQL
+              sql = "{CALL insertarReserva(?,?)}";
+              CallableStatement insertarReserva = connection.prepareCall(sql);
+              insertarReserva.setString(1,dni);
+              insertarReserva.setInt(2,id_oferta);
+              insertarReserva.executeQuery();
+
+              insertarReserva.close();
+              connection.close();
+              comprarBilleteResponse.setConfirmacion(true);
+            }
+          }catch (SQLException e){
+              System.out.println(e.getMessage());
+          } catch (ClassNotFoundException e) {
+              e.printStackTrace();
+          }
 
         return comprarBilleteResponse;
     }
@@ -372,11 +429,13 @@ public class OrquestadorSkeleton {
         String fechaSalida = obtenerOfertas.getFechaSalida();
         String fechaRegreso = obtenerOfertas.getFechaRegreso();
         String dni = obtenerOfertas.getDni();
+        String endpointVuelos = browse.browseService("Vuelos");
 
         int opcion = obtenerCodigosIATA();
         switch (opcion){
             case 1:
                 //uso de BBDD
+
                 ServiceClient servicioVuelos = new ServiceClient();
                 Options opciones = new Options();
                 MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
@@ -389,7 +448,8 @@ public class OrquestadorSkeleton {
                 HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
                 opciones.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
                 opciones.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-                opciones.setTo(new EndpointReference("http://localhost:8080/axis2/services/Vuelos"));
+                //opciones.setTo(new EndpointReference(endpointVuelos));
+                opciones.setTo(new EndpointReference("http://localhost:8081/axis2/services/Vuelos"));
                 opciones.setAction("urn:getInfoVuelos");
                 servicioVuelos.setOptions(opciones);
                 OMElement response = servicioVuelos.sendReceive(
@@ -430,7 +490,8 @@ public class OrquestadorSkeleton {
                         httpClient = new HttpClient(multiThreadedHttpConnectionManager);
                         opciones.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
                         opciones.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-                        opciones.setTo(new EndpointReference("http://localhost:8080/axis2/services/Vuelos"));
+                        //opciones.setTo(new EndpointReference(endpointVuelos));
+                        opciones.setTo(new EndpointReference("http://localhost:8081/axis2/services/Vuelos"));
                         opciones.setAction("urn:getInfoVuelos");
                         servicioVuelos.setOptions(opciones);
 
@@ -567,6 +628,9 @@ public class OrquestadorSkeleton {
     *          -> 2 si se ha usado el servicio externo webservicesX.
     */
    private static int obtenerCodigosIATA() throws AxisFault, ClassNotFoundException, SQLException, InterruptedException {
+
+       String endpointAeropuertos = browse.browseService("Aeropuertos");
+
        boolean origenExiste = false, destinoExiste = false;
 
        ServiceClient servicioAeropuertos = new ServiceClient();
@@ -581,7 +645,8 @@ public class OrquestadorSkeleton {
        HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
        opciones.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
        opciones.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-       opciones.setTo(new EndpointReference("http://localhost:8080/axis2/services/Aeropuertos"));
+       opciones.setTo(new EndpointReference("http://localhost:8081/axis2/services/Aeropuertos"));
+       //opciones.setTo(new EndpointReference(endpointAeropuertos));
        opciones.setAction("urn:getInfoAeropuerto");
        servicioAeropuertos.setOptions(opciones);
        servicioAeropuertos.sendReceiveNonBlocking(createPayLoadAeropuertos(origen,destino), new MyCallBack());
@@ -684,5 +749,37 @@ public class OrquestadorSkeleton {
         omElement.addChild(ciudadDestino);
 
         return omElement;
+    }
+
+    /**
+     * Metodo usado para la creacion del cuerpo de carga para
+     * contactar con el WS_Banco.
+     *
+     * @return el cuerpo del mensaje SOAP
+     */
+
+    private static OMElement createPayLoadBanco(String importe,String iban, String cuentaDestino,String email){
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace omNs = fac.createOMNamespace("http://ws.apache.org/axis2", "ns");
+        OMElement method = fac.createOMElement("pagar", omNs);
+
+        // Importe
+        OMElement im = fac.createOMElement("importe", omNs);
+        im.setText(importe);
+        method.addChild(im);
+        // Cuenta origen
+        OMElement co = fac.createOMElement("cuentaOrigen", omNs);
+        co.setText(iban);
+        method.addChild(co);
+        // Cuenta destino
+        OMElement cd = fac.createOMElement("cuentaDestino", omNs);
+        cd.setText(cuentaDestino);
+        method.addChild(cd);
+        // Email
+        OMElement des = fac.createOMElement("destinatario", omNs);
+        des.setText(email);
+        method.addChild(des);
+
+        return method;
     }
 }

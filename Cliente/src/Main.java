@@ -21,16 +21,25 @@ public class Main {
     private static String dniCliente;
     private static String password;
     private static TreeMap<Integer,String> mapaOfertas = new TreeMap<>();
+    private static String endpoint;
+    private static Scanner scan = new Scanner(System.in);
 
     public static void main(String[] args) throws AxisFault {
-        Scanner scan = new Scanner(System.in);
-        int opcion;
+    	// Buscamos al orquestador en UDDI
+    	Browse sp = new Browse();
+		endpoint = sp.browseService("Orquestador");
+    	
+		if(endpoint == null) {
+			System.out.println("No se ha encontrado el servicio: Orquestador (endpoint: "+endpoint+")");
+			System.exit(1);
+		}   	
 
+        int opcion;
         while (true){
             System.out.println("\n\n\tBIENVENIDO A NUESTRO SERVICIO DE VUELOS NACIONALES\n\n");
-            System.out.println("\t1.- Iniciar sesión.");
+            System.out.println("\t1.- Iniciar sesion.");
             System.out.println("\t2.- Registrarse.");
-            System.out.println("\n\nSeleccione una opción: ");
+            System.out.println("\n\nSeleccione una opcion: ");
             opcion = Integer.parseInt(scan.nextLine());
             switch (opcion){
                 case 1: //Iniciar sesion.
@@ -41,39 +50,33 @@ public class Main {
                     registrarse();
                     break;
                 default: //Opcion no valida.
-                    System.out.println("\n\n\tOpción no válida, volviendo al inicio...");
+                    System.out.println("\n\n\tOpcion no valida, volviendo al inicio...");
                     break;
             }
        }
     }
 
     private static boolean iniciarSesion(){
-        Scanner scan = new Scanner(System.in);
-
         System.out.println("\n\n\tBIENVENIDO AL INICIO DE SESION DE NUESTRA PLATAFORMA.");
         System.out.println("\n\tINSERTE LOS SIGUIENTES DATOS:");
 
         System.out.println("\tUsuario(dni): ");
         dniCliente = scan.nextLine();
-        System.out.println("\tContraseña: ");
+        System.out.println("\tContrasena: ");
         password = scan.nextLine();
 
         if (dniCliente.length() == 9){
             if (comprobarRegistroCliente())
                 return true;
             else
-                System.out.println("\n\n\tEl usuario no está registrado en la plataforma, volviendo al inicio...");
+                System.out.println("\n\n\tEl usuario no esta registrado en la plataforma, volviendo al inicio...");
         }else
-            System.out.println("\n\n\tDNI no válido, volviendo al inicio...");
-
-        scan.close();
+            System.out.println("\n\n\tDNI no valido, volviendo al inicio...");
 
         return false;
     }
 
     private static void registrarse(){
-        Scanner scan = new Scanner(System.in);
-
         System.out.println("\n\n\tBIENVENIDO AL REGISTRO DE NUESTRA PLATAFORMA.");
         System.out.println("\n\tINSERTE LOS SIGUIENTES DATOS:");
 
@@ -85,57 +88,50 @@ public class Main {
         String apellido2Temp = scan.nextLine();
         System.out.println("\tDNI: ");
         String dniTemp = scan.nextLine();
-        System.out.println("\tCorreo electrónico: ");
+        System.out.println("\tCorreo electronico: ");
         String emailTemp = scan.nextLine();
-        System.out.println("\tTeléfono de contacto: ");
+        System.out.println("\tTelefono de contacto: ");
         String telefonoTemp = scan.nextLine();
-        System.out.println("\tContraseña: ");
+        System.out.println("\tContrasena: ");
         String passTemp = scan.nextLine();
 
         if (dniTemp.length() == 9){
             if (registrarCliente(nombreTemp,apellido1Temp,apellido2Temp,dniTemp,emailTemp,telefonoTemp,passTemp)){
-                System.out.println("\n\n\tCliente registrado con éxito.");
+                System.out.println("\n\n\tCliente registrado con exito, volviendo al inicio...");
             }else {
-                System.out.println("\n\n\tYa existe un cliente registrado con ese dni.");
+                System.out.println("\n\n\tYa existe un cliente registrado con ese dni, volviendo al inicio...");
             }
-        }else System.out.println("\n\n\tDNI no válido, volviendo al inicio...");
-
-        scan.close();
+        }else System.out.println("\n\n\tDNI no valido, volviendo al inicio...");
     }
 
     private static void menuPrincipal(){
         int opcion;
-        Scanner scan = new Scanner(System.in);
         while (true){
             System.out.println("\n\n\tBIENVENIDO A NUESTRO SERVICIO DE VUELOS NACIONALES\n\n");
             System.out.println("\t1.- Buscar vuelos.");
             System.out.println("\t2.- Ver reservas.");
-            System.out.println("\t3.- Cerrar sesión");
-            System.out.println("\n\n\tSeleccione una opción: ");
+            System.out.println("\t3.- Cerrar sesion");
+            System.out.println("\n\n\tSeleccione una opcion: ");
 
             opcion = Integer.parseInt(scan.nextLine());
             switch (opcion){
                 case 1: //Buscar vuelos.
                     buscarComprar();
-                    System.out.println("\n\n\tPulse ENTER para continuar.");
-                    scan.nextLine();
                     break;
                 case 2: //Ver las reservas del cliente.
-                    System.out.println(verReservasCliente());
-                    System.out.println("\n\n\tPulse ENTER para continuar.");
-                    scan.nextLine();
+                    verReservasCliente();
                     break;
                 case 3: //Cerrar sesion.
                     System.out.println("\n\n\tCerrando sesión... ");
+                    scan.close();
                     System.exit(0);
                     break;
                 default://Opcion no valida.
-                    System.out.println("\n\n\tOpción no válida, volviendo al inicio...");
+                    System.out.println("\n\n\tOpcion no valida, volviendo al inicio...");
                     break;
             }
         }
     }
-
 
     private static boolean comprobarRegistroCliente(){
         try {
@@ -152,7 +148,7 @@ public class Main {
             HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
             options.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
             options.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-            options.setTo(new EndpointReference("http://localhost:8080/axis2/services/Orquestador"));
+            options.setTo(new EndpointReference(endpoint));
             options.setAction("urn:comprobarClienteRegistrado");
             serviceClient.setOptions(options);
 
@@ -185,7 +181,7 @@ public class Main {
             HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
             options.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
             options.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-            options.setTo(new EndpointReference("http://localhost:8080/axis2/services/Orquestador"));
+            options.setTo(new EndpointReference(endpoint));
             options.setAction("urn:registrarCliente");
             serviceClient.setOptions(options);
 
@@ -208,7 +204,7 @@ public class Main {
 
     }
 
-    private static String verReservasCliente(){
+    private static void verReservasCliente(){
         //New ServiceClient.
         ServiceClient serviceClient;
         try {
@@ -224,7 +220,7 @@ public class Main {
             HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
             options.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
             options.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-            options.setTo(new EndpointReference("http://localhost:8080/axis2/services/Orquestador"));
+            options.setTo(new EndpointReference(endpoint));
             options.setAction("urn:verReservasCliente");
             serviceClient.setOptions(options);
 
@@ -233,11 +229,11 @@ public class Main {
             JSONObject object = new JSONObject(response.getFirstElement().getText());
             if (object.has("ValidationErrors")){
                 JSONArray array = object.getJSONArray("ValidationErrors");
-                return "\n\n\t" + array.getJSONObject(0).getString("Message");
+                System.out.println("\n\n\t" + array.getJSONObject(0).getString("Message"));
             }else {
                 if (object.has("Reservas")){
                     JSONArray array = object.getJSONArray("Reservas");
-                    if (array.length() == 0) return "\n\n\t" + "Usted no tiene reservas a su nombre.";
+                    if (array.length() == 0) System.out.println("\n\n\t" + "Usted no tiene reservas a su nombre.");
                     else {
                         String reservas = "\n\n\t" +"Reservas: \n\n\n";
                         int precio;
@@ -279,19 +275,21 @@ public class Main {
                             reservas = reservas + "\n\n";
                         }
 
-                        return reservas;
+                        System.out.println(reservas);
                     }
                 }else
-                    return "\n\n\tError desconocido.";
+                    System.out.println("\n\n\tError desconocido.");
             }
 
         } catch (AxisFault axisFault) {
-            return axisFault.getMessage();
+            System.out.println(axisFault.getMessage());
         }
+
+        System.out.println("\n\n\tPulse ENTER para continuar.");
+        scan.nextLine();
     }
 
     private static void buscarComprar(){
-        Scanner scan = new Scanner(System.in);
         System.out.println("\n\n\tBIENVENIDO A NUESTRO SISTEMA DE BUSQUEDA DE VUELOS NACIONALES\n\n");
         System.out.println("Ciudad de origen: ");
         String ciudadOrigen = scan.nextLine();
@@ -318,6 +316,12 @@ public class Main {
                     if (opcion > 0 && opcion < mapaOfertas.size()){
                         System.out.println("A seleccionado la opcion de compra: " + opcion);
                         System.out.println("Se va a proceder a la compra...");
+                        System.out.println("\n\nIngrese su IBAN: ");
+                        String iban = scan.nextLine();
+                        System.out.println("Ingrese su codigo de seguridad: ");
+                        String token = scan.nextLine();
+
+                        comprarBillete(opcion,iban,token);
                     }else System.out.println("\n\n\tOpción no válida, volviendo al menu principal...");
                     break;
                 case 2:
@@ -328,7 +332,6 @@ public class Main {
                     break;
             }
         }
-
         mapaOfertas.clear();
     }
 
@@ -348,7 +351,7 @@ public class Main {
             HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
             options.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
             options.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-            options.setTo(new EndpointReference("http://localhost:8080/axis2/services/Orquestador"));
+            options.setTo(new EndpointReference(endpoint));
             options.setAction("urn:obtenerOfertas");
             serviceClient.setOptions(options);
 
@@ -422,6 +425,32 @@ public class Main {
         } catch (AxisFault axisFault) {
             System.out.println(axisFault.getMessage());
             return false;
+        }
+    }
+
+    private static void comprarBillete(int oferta, String IBAN, String token){
+        ServiceClient serviceClient = null;
+        try {
+            serviceClient = new ServiceClient();
+            Options options = new Options();
+            MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
+            HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+            params.setDefaultMaxConnectionsPerHost(20);
+            params.setMaxTotalConnections(20);
+            params.setSoTimeout(20000);
+            params.setConnectionTimeout(20000);
+            multiThreadedHttpConnectionManager.setParams(params);
+            HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
+            options.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
+            options.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
+            options.setTo(new EndpointReference(endpoint));
+            options.setAction("urn:comprarBillete");
+            serviceClient.setOptions(options);
+
+
+
+        } catch (AxisFault axisFault) {
+            System.out.println(axisFault.getMessage());
         }
     }
 
@@ -507,6 +536,19 @@ public class Main {
         omElement.addChild(fechaS);
         omElement.addChild(fechaR);
         omElement.addChild(dni);
+
+        return omElement;
+    }
+
+    private static OMElement createPayLoadComprarBillete(int ofertaCliente, String IBANCliente, String tokenCliente){
+        OMFactory factory = OMAbstractFactory.getOMFactory();
+        OMNamespace omNamespace = factory.createOMNamespace("http://Orquestador","ns");
+        OMElement omElement = factory.createOMElement("comprarBillete",omNamespace);
+        OMElement oferta = factory.createOMElement("id_oferta",omNamespace);
+        OMElement dni = factory.createOMElement("dni",omNamespace);
+        OMElement iban = factory.createOMElement("iban",omNamespace);
+
+        //TODO acabar.
 
         return omElement;
     }

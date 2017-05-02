@@ -33,9 +33,7 @@ CREATE PROCEDURE introducirIata(
   END//
 DELIMITER ;
 
-/**
-* Procedimiento almacenado insertarCliente: inserta un cliente en la base de datos si no existe.
-*/
+/* Procedimiento almacenado insertarCliente: inserta un cliente en la base de datos si no existe. */
 DELIMITER //
 CREATE PROCEDURE insertarCliente(
   IN _nombre VARCHAR(100),
@@ -136,9 +134,7 @@ DELIMITER ;
 
 
 
-/**
-* Procedimiento almacenado insertarReserva: inserta una nueva reserva para un cliente.
-*/
+/* Procedimiento almacenado insertarReserva: inserta una nueva reserva para un cliente.*/
 DELIMITER //
 CREATE PROCEDURE insertarReserva(
   IN _dni CHAR(9),
@@ -218,9 +214,7 @@ CREATE PROCEDURE insertarReserva(
 DELIMITER ;
 
 
-/**
-Procedimiento almacenado ver_reservas cliente: obtiene todas las reservas de un cliente dado su dni.
- */
+/*Procedimiento almacenado ver_reservas cliente: obtiene todas las reservas de un cliente dado su dni. */
 DELIMITER //
 CREATE PROCEDURE verReservasCliente(IN _dni CHAR(9))
   BEGIN
@@ -246,10 +240,7 @@ CREATE PROCEDURE verReservasCliente(IN _dni CHAR(9))
   END //
 DELIMITER ;
 
-/**
-Procedimiento almacenado comprobar_registro: comprueba si un cliente esta registrado en el sistema por
-medio de su dni y una contraseña.
- */
+/* Procedimiento almacenado comprobar_registro: comprueba si un cliente esta registrado en el sistema por medio de su dni y una contraseña. */
 
 DELIMITER //
 CREATE PROCEDURE comprobarRegistro(
@@ -272,10 +263,7 @@ CREATE PROCEDURE obtenerEmail(IN _dni CHAR(9))
   END//
 DELIMITER ;
 
-/**
-Procedimiento almacenado obtenerPrecioOferta: usado para obtener el precio de la oferta
-seleccionada por el cliente.
- */
+/*Procedimiento almacenado obtenerPrecioOferta: usado para obtener el precio de la oferta seleccionada por el cliente. */
 DELIMITER //
 CREATE PROCEDURE obtenerPrecioOferta(IN _dni CHAR(9), IN _id_oferta_vuelo INTEGER)
   BEGIN
