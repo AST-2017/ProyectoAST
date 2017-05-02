@@ -195,11 +195,10 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
         limpiarVariables();
         ComprarBilleteResponse comprarBilleteResponse = new ComprarBilleteResponse();
         comprarBilleteResponse.setConfirmacion(false);
-        int id_oferta = comprarBillete.getId_oferta();
+        int id_oferta = Integer.parseInt(comprarBillete.getId_oferta());
         String dni = comprarBillete.getDni();
         String iban = comprarBillete.getIban();
-        //TODO token.
-        String token = "qwerty";
+        String token = comprarBillete.getToken();
         String email = null;
         String cuentaDestino = "12345678";
         int importe = 0;
@@ -448,8 +447,7 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
                 HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
                 opciones.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
                 opciones.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-                //opciones.setTo(new EndpointReference(endpointVuelos));
-                opciones.setTo(new EndpointReference("http://localhost:8081/axis2/services/Vuelos"));
+                opciones.setTo(new EndpointReference(endpointVuelos));
                 opciones.setAction("urn:getInfoVuelos");
                 servicioVuelos.setOptions(opciones);
                 OMElement response = servicioVuelos.sendReceive(
@@ -490,8 +488,7 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
                         httpClient = new HttpClient(multiThreadedHttpConnectionManager);
                         opciones.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
                         opciones.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-                        //opciones.setTo(new EndpointReference(endpointVuelos));
-                        opciones.setTo(new EndpointReference("http://localhost:8081/axis2/services/Vuelos"));
+                        opciones.setTo(new EndpointReference(endpointVuelos));
                         opciones.setAction("urn:getInfoVuelos");
                         servicioVuelos.setOptions(opciones);
 
@@ -645,8 +642,7 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
        HttpClient httpClient = new HttpClient(multiThreadedHttpConnectionManager);
        opciones.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, true);
        opciones.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-       opciones.setTo(new EndpointReference("http://localhost:8081/axis2/services/Aeropuertos"));
-       //opciones.setTo(new EndpointReference(endpointAeropuertos));
+       opciones.setTo(new EndpointReference(endpointAeropuertos));
        opciones.setAction("urn:getInfoAeropuerto");
        servicioAeropuertos.setOptions(opciones);
        servicioAeropuertos.sendReceiveNonBlocking(createPayLoadAeropuertos(origen,destino), new MyCallBack());

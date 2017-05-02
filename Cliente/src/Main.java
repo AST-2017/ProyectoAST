@@ -428,7 +428,7 @@ public class Main {
         }
     }
 
-    private static void comprarBillete(int oferta, String IBAN, String token){
+    private static void comprarBillete(int oferta, String iban, String token){
         ServiceClient serviceClient = null;
         try {
             serviceClient = new ServiceClient();
@@ -447,8 +447,16 @@ public class Main {
             options.setAction("urn:comprarBillete");
             serviceClient.setOptions(options);
 
+            OMElement response = serviceClient.sendReceive(createPayLoadComprarBillete(oferta,iban,token));
 
-
+            if (Boolean.valueOf(response.getFirstElement().getText())){
+                System.out.println("¡Muchas gracias por su compra!");
+                System.out.println("Su pago se ha realizado con exito, recibirá una confirmación de pago al email.");
+                System.out.println("Puede ver su nueva reserva en nuestro apartado \"Ver resrevas\".");
+            }else {
+                System.out.println("Disculpe las molestias, no se ha podido realizar el pago de su reserva, " +
+                        "le llegará un mensaje informativo a su email.");
+            }
         } catch (AxisFault axisFault) {
             System.out.println(axisFault.getMessage());
         }
@@ -540,15 +548,24 @@ public class Main {
         return omElement;
     }
 
-    private static OMElement createPayLoadComprarBillete(int ofertaCliente, String IBANCliente, String tokenCliente){
+    private static OMElement createPayLoadComprarBillete(int ofertaCliente, String ibanCliente, String tokenCliente){
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMNamespace omNamespace = factory.createOMNamespace("http://Orquestador","ns");
         OMElement omElement = factory.createOMElement("comprarBillete",omNamespace);
         OMElement oferta = factory.createOMElement("id_oferta",omNamespace);
         OMElement dni = factory.createOMElement("dni",omNamespace);
         OMElement iban = factory.createOMElement("iban",omNamespace);
+        OMElement token = factory.createOMElement("token",omNamespace);
 
-        //TODO acabar.
+        oferta.setText(String.valueOf(ofertaCliente));
+        dni.setText(dniCliente);
+        iban.setText(ibanCliente);
+        token.setText(tokenCliente);
+
+        omElement.addChild(oferta);
+        omElement.addChild(dni);
+        omElement.addChild(iban);
+        omElement.addChild(token);
 
         return omElement;
     }

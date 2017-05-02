@@ -209,7 +209,7 @@ public class Browse {
 		
 		System.out.println("\nService Name: " + ListToString(get.getName()));
 		for (int i = 0; i < get.getName().size(); i++) {
-			
+			//TODO WTF.
 			if((get.getName().get(i).getValue()).equals(ServiceName))
 				PrintBindingTemplates(get.getBindingTemplates());
 			

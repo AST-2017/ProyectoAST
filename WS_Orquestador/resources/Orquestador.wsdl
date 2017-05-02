@@ -72,9 +72,10 @@
             <xs:element name="comprarBillete">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="id_oferta" type="xs:int"/>
+                        <xs:element name="id_oferta" type="xs:string"/>
                         <xs:element minOccurs="0" name="dni" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="iban" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="token" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
