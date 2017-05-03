@@ -17,23 +17,21 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-public class Main {
+public class Cliente {
     private static String dniCliente;
     private static String password;
     private static TreeMap<Integer,String> mapaOfertas = new TreeMap<>();
     private static String endpoint;
     private static Scanner scan = new Scanner(System.in);
+    private static Browse sp = new Browse();
 
     public static void main(String[] args){
-    	// Buscamos al orquestador en UDDI
-    	Browse sp = new Browse();
-		endpoint = sp.browseService("Orquestador");
-    	
-		if(endpoint == null) {
-			System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
-			System.exit(1);
-		}
-
+        // Buscamos al orquestador en UDDI
+        endpoint = sp.browseService("Orquestador");
+        if(endpoint == null) {
+            System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
+            System.exit(1);
+        }
 
         int opcion;
         while (true){
@@ -54,7 +52,7 @@ public class Main {
                     System.out.println("\n\n\tOpcion no valida, volviendo al inicio...");
                     break;
             }
-       }
+        }
     }
 
     private static boolean iniciarSesion(){
@@ -123,7 +121,7 @@ public class Main {
                     verReservasCliente();
                     break;
                 case 3: //Cerrar sesion.
-                    System.out.println("\n\n\tCerrando sesión... ");
+                    System.out.println("\n\n\tCerrando sesi�n... ");
                     scan.close();
                     System.exit(0);
                     break;
@@ -154,10 +152,12 @@ public class Main {
             serviceClient.setOptions(options);
 
             //Create payload and get the response.
-            OMElement response = serviceClient.sendReceive(createPayLoadComprobarClienteRegistrado());
-
-            return Boolean.valueOf(response.getFirstElement().getText());
-
+            if(sp.browseService("Orquestador") != null){
+                OMElement response = serviceClient.sendReceive(createPayLoadComprobarClienteRegistrado());
+                return Boolean.valueOf(response.getFirstElement().getText());
+            }else{
+                System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
+            }
         } catch (AxisFault axisFault) {
             System.out.println(axisFault.getMessage());
         }
@@ -187,16 +187,19 @@ public class Main {
             serviceClient.setOptions(options);
 
             //Create payload and get the response.
-            OMElement response = serviceClient.sendReceive(createPayLoadRegistrarCliente(
-                    nombreCliente,
-                    apellido1Cliente,
-                    apellido2Cliente,
-                    dniCliente,
-                    emailCliente,
-                    telefonoCliente,
-                    passwordCliente));
-
-            return Boolean.valueOf(response.getFirstElement().getText());
+            if(sp.browseService("Orquestador") != null){
+                OMElement response = serviceClient.sendReceive(createPayLoadRegistrarCliente(
+                        nombreCliente,
+                        apellido1Cliente,
+                        apellido2Cliente,
+                        dniCliente,
+                        emailCliente,
+                        telefonoCliente,
+                        passwordCliente));
+                return Boolean.valueOf(response.getFirstElement().getText());
+            }else{
+                System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
+            }
 
         } catch (AxisFault axisFault) {
             System.out.println(axisFault.getMessage());
@@ -225,63 +228,67 @@ public class Main {
             options.setAction("urn:verReservasCliente");
             serviceClient.setOptions(options);
 
-            OMElement response = serviceClient.sendReceive(createPayLoadVerReservasCliente());
+            if(sp.browseService("Orquestador") != null){
 
-            JSONObject object = new JSONObject(response.getFirstElement().getText());
-            if (object.has("ValidationErrors")){
-                JSONArray array = object.getJSONArray("ValidationErrors");
-                System.out.println("\n\n\t" + array.getJSONObject(0).getString("Message"));
-            }else {
-                if (object.has("Reservas")){
-                    JSONArray array = object.getJSONArray("Reservas");
-                    if (array.length() == 0) System.out.println("\n\n\t" + "Usted no tiene reservas a su nombre.");
-                    else {
-                        String reservas = "\n\n\t" +"Reservas: \n\n\n";
-                        int precio;
-                        String vueloDirectoSalida;
-                        String vueloDirectoRegreso;
-                        String fechaSalida;
-                        String fechaRegreso;
-                        String origen;
-                        String destino;
-                        String codigoIATAOrigen;
-                        String codigoIATADestino;
-                        String aerolineaSalida;
-                        String aerolineaRegreso;
+                OMElement response = serviceClient.sendReceive(createPayLoadVerReservasCliente());
 
-                        for (int i = 0; i < array.length(); i++) {
-                            JSONObject objectAux = array.getJSONObject(i);
-                            precio = objectAux.getInt("precio");
-                            boolean vueloDirectoS = objectAux.getBoolean("vueloDirectoSalida");
-                            if (vueloDirectoS) vueloDirectoSalida = "Si";
-                            else vueloDirectoSalida = "No";
-                            boolean vueloDirectoR = objectAux.getBoolean("vueloDirectoRegreso");
-                            if (vueloDirectoR) vueloDirectoRegreso = "Si";
-                            else vueloDirectoRegreso = "No";
-                            fechaSalida = objectAux.getString("fechaSalida");
-                            fechaRegreso = objectAux.getString("fechaRegreso");
-                            origen = objectAux.getString("origen");
-                            destino = objectAux.getString("destino");
-                            codigoIATAOrigen = objectAux.getString("codigoIATAOrigen");
-                            codigoIATADestino = objectAux.getString("codigoIATADestino");
-                            aerolineaSalida = objectAux.getString("aerolineaSalida");
-                            aerolineaRegreso = objectAux.getString("aerolineaRegreso");
+                JSONObject object = new JSONObject(response.getFirstElement().getText());
+                if (object.has("ValidationErrors")){
+                    JSONArray array = object.getJSONArray("ValidationErrors");
+                    System.out.println("\n\n\t" + array.getJSONObject(0).getString("Message"));
+                }else {
+                    if (object.has("Reservas")){
+                        JSONArray array = object.getJSONArray("Reservas");
+                        if (array.length() == 0) System.out.println("\n\n\t" + "Usted no tiene reservas a su nombre.");
+                        else {
+                            String reservas = "\n\n\t" +"Reservas: \n\n\n";
+                            int precio;
+                            String vueloDirectoSalida;
+                            String vueloDirectoRegreso;
+                            String fechaSalida;
+                            String fechaRegreso;
+                            String origen;
+                            String destino;
+                            String codigoIATAOrigen;
+                            String codigoIATADestino;
+                            String aerolineaSalida;
+                            String aerolineaRegreso;
 
-                            reservas = reservas + "\t[Fecha de salida: " + fechaSalida + "], [Fecha regreso: " + fechaRegreso + "]\n";
-                            reservas = reservas + "\t-> Origen: " + origen + " [" + codigoIATAOrigen + "].\n";
-                            reservas = reservas + "\t-> Destino: " + destino + " [" + codigoIATADestino + "].\n";
-                            reservas = reservas + "\t-> Precio: " + precio + ".\n";
-                            reservas = reservas + "\t-> Aerolinea de ida: " + aerolineaSalida + ", vuelo directo: " + vueloDirectoSalida + ".\n";
-                            reservas = reservas + "\t-> Aerolinea de regreso: " + aerolineaRegreso + ", vuelo directo: " + vueloDirectoRegreso + ".\n";
-                            reservas = reservas + "\n\n";
+                            for (int i = 0; i < array.length(); i++) {
+                                JSONObject objectAux = array.getJSONObject(i);
+                                precio = objectAux.getInt("precio");
+                                boolean vueloDirectoS = objectAux.getBoolean("vueloDirectoSalida");
+                                if (vueloDirectoS) vueloDirectoSalida = "Si";
+                                else vueloDirectoSalida = "No";
+                                boolean vueloDirectoR = objectAux.getBoolean("vueloDirectoRegreso");
+                                if (vueloDirectoR) vueloDirectoRegreso = "Si";
+                                else vueloDirectoRegreso = "No";
+                                fechaSalida = objectAux.getString("fechaSalida");
+                                fechaRegreso = objectAux.getString("fechaRegreso");
+                                origen = objectAux.getString("origen");
+                                destino = objectAux.getString("destino");
+                                codigoIATAOrigen = objectAux.getString("codigoIATAOrigen");
+                                codigoIATADestino = objectAux.getString("codigoIATADestino");
+                                aerolineaSalida = objectAux.getString("aerolineaSalida");
+                                aerolineaRegreso = objectAux.getString("aerolineaRegreso");
+
+                                reservas = reservas + "\t[Fecha de salida: " + fechaSalida + "], [Fecha regreso: " + fechaRegreso + "]\n";
+                                reservas = reservas + "\t-> Origen: " + origen + " [" + codigoIATAOrigen + "].\n";
+                                reservas = reservas + "\t-> Destino: " + destino + " [" + codigoIATADestino + "].\n";
+                                reservas = reservas + "\t-> Precio: " + precio + ".\n";
+                                reservas = reservas + "\t-> Aerolinea de ida: " + aerolineaSalida + ", vuelo directo: " + vueloDirectoSalida + ".\n";
+                                reservas = reservas + "\t-> Aerolinea de regreso: " + aerolineaRegreso + ", vuelo directo: " + vueloDirectoRegreso + ".\n";
+                                reservas = reservas + "\n\n";
+                            }
+
+                            System.out.println(reservas);
                         }
-
-                        System.out.println(reservas);
-                    }
-                }else
-                    System.out.println("\n\n\tError desconocido.");
+                    }else
+                        System.out.println("\n\n\tError desconocido.");
+                }
+            } else{
+                System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
             }
-
         } catch (AxisFault axisFault) {
             System.out.println(axisFault.getMessage());
         }
@@ -306,7 +313,7 @@ public class Main {
             for (Map.Entry<Integer,String> entry : mapaOfertas.entrySet()) {
                 System.out.println(entry.getValue() + "\n\n");
             }
-            System.out.println("\n\n\t¿Desea comprar algun vuelo?");
+            System.out.println("\n\n\t�Desea comprar algun vuelo?");
             System.out.println("\t1. Si.");
             System.out.println("\t2. No");
             System.out.println("\n\n\tOpcion: ");
@@ -323,13 +330,13 @@ public class Main {
                         String token = scan.nextLine();
 
                         comprarBillete(opcion,iban,token);
-                    }else System.out.println("\n\n\tOpción no válida, volviendo al menu principal...");
+                    }else System.out.println("\n\n\tOpci�n no v�lida, volviendo al menu principal...");
                     break;
                 case 2:
                     System.out.println("\n\n\tVolviendo al menu principal...");
                     break;
                 default:
-                    System.out.println("\n\n\tOpción no válida, volviendo al menu principal...");
+                    System.out.println("\n\n\tOpci�n no v�lida, volviendo al menu principal...");
                     break;
             }
         }
@@ -356,71 +363,76 @@ public class Main {
             options.setAction("urn:obtenerOfertas");
             serviceClient.setOptions(options);
 
-            OMElement response = serviceClient.sendReceive(
-                    createPayLoadObtenerOfertas(ciudadOrigen,ciudadDestino,fechaSalida,fechaRegreso));
+            if(sp.browseService("Orquestador") != null){
 
-            JSONObject object = new JSONObject(response.getFirstElement().getText());
+                OMElement response = serviceClient.sendReceive(
+                        createPayLoadObtenerOfertas(ciudadOrigen,ciudadDestino,fechaSalida,fechaRegreso));
 
-            if (object.has("ValidationErrors")){
-                JSONArray array = object.getJSONArray("ValidationErrors");
-                System.out.println("\n\n\t"+ array.getJSONObject(0).getString("Message"));
+                JSONObject object = new JSONObject(response.getFirstElement().getText());
 
-                return false;
-            }else {
-                JSONArray array = object.getJSONArray("Ofertas");
-
-                if (array.length() == 0){
-                    System.out.println("\n\n\tNo hay vuelos disponibles para la fecha de salida: " + fechaSalida +
-                            " y la fecha de regreso: " + fechaRegreso + ", para las ciudades de origen: " + ciudadOrigen +
-                            " y la ciudad de destino: " + ciudadDestino);
+                if (object.has("ValidationErrors")){
+                    JSONArray array = object.getJSONArray("ValidationErrors");
+                    System.out.println("\n\n\t"+ array.getJSONObject(0).getString("Message"));
 
                     return false;
-                }
-                else {
-                    int idOfertaR;
-                    int precioR;
-                    String vueloDirectoSalidaR;
-                    String vueloDirectoRegresoR;
-                    String fechaSalidaR;
-                    String fechaRegresoR;
-                    String origenR;
-                    String destinoR;
-                    String codigoIATAOrigenR;
-                    String codigoIATADestinoR;
-                    String aerolineaSalidaR;
-                    String aerolineaRegresoR;
-                    String oferta;
+                }else {
+                    JSONArray array = object.getJSONArray("Ofertas");
 
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject objectAux = array.getJSONObject(i);
+                    if (array.length() == 0){
+                        System.out.println("\n\n\tNo hay vuelos disponibles para la fecha de salida: " + fechaSalida +
+                                " y la fecha de regreso: " + fechaRegreso + ", para las ciudades de origen: " + ciudadOrigen +
+                                " y la ciudad de destino: " + ciudadDestino);
 
-                        idOfertaR = objectAux.getInt("idOferta");
-                        precioR = objectAux.getInt("precio");
-                        if (objectAux.getBoolean("vueloDirectoSalida")) vueloDirectoSalidaR = "Si";
-                        else vueloDirectoSalidaR = "No";
-                        if (objectAux.getBoolean("vueloDirectoRegreso")) vueloDirectoRegresoR = "Si";
-                        else vueloDirectoRegresoR = "No";
-                        fechaSalidaR = objectAux.getString("fechaSalida");
-                        fechaRegresoR = objectAux.getString("fechaRegreso");
-                        origenR = objectAux.getString("origenSalida");
-                        destinoR = objectAux.getString("destinoSalida");
-                        codigoIATAOrigenR = objectAux.getString("iataCodeOrigenSalida");
-                        codigoIATADestinoR = objectAux.getString("iataCodeDestinoSalida");
-                        aerolineaSalidaR = objectAux.getString("aerolineaSalida");
-                        aerolineaRegresoR = objectAux.getString("aerolineaRegreso");
-
-                        oferta = "\tOpcion "+idOfertaR+".- [Fecha de salida: " + fechaSalidaR + "], [Fecha regreso: " + fechaRegresoR + "]\n";
-                        oferta = oferta + "\t-> Origen: " + origenR + " [" + codigoIATAOrigenR + "].\n";
-                        oferta = oferta + "\t-> Destino: " + destinoR + " [" + codigoIATADestinoR + "].\n";
-                        oferta = oferta + "\t-> Precio: " + precioR + ".\n";
-                        oferta = oferta + "\t-> Aerolinea de ida: " + aerolineaSalidaR + ", vuelo directo: " + vueloDirectoSalidaR + ".\n";
-                        oferta = oferta+ "\t-> Aerolinea de regreso: " + aerolineaRegresoR + ", vuelo directo: " + vueloDirectoRegresoR + ".\n";
-
-                        mapaOfertas.put(idOfertaR,oferta);
+                        return false;
                     }
+                    else {
+                        int idOfertaR;
+                        int precioR;
+                        String vueloDirectoSalidaR;
+                        String vueloDirectoRegresoR;
+                        String fechaSalidaR;
+                        String fechaRegresoR;
+                        String origenR;
+                        String destinoR;
+                        String codigoIATAOrigenR;
+                        String codigoIATADestinoR;
+                        String aerolineaSalidaR;
+                        String aerolineaRegresoR;
+                        String oferta;
 
-                    return true;
+                        for (int i = 0; i < array.length(); i++) {
+                            JSONObject objectAux = array.getJSONObject(i);
+
+                            idOfertaR = objectAux.getInt("idOferta");
+                            precioR = objectAux.getInt("precio");
+                            if (objectAux.getBoolean("vueloDirectoSalida")) vueloDirectoSalidaR = "Si";
+                            else vueloDirectoSalidaR = "No";
+                            if (objectAux.getBoolean("vueloDirectoRegreso")) vueloDirectoRegresoR = "Si";
+                            else vueloDirectoRegresoR = "No";
+                            fechaSalidaR = objectAux.getString("fechaSalida");
+                            fechaRegresoR = objectAux.getString("fechaRegreso");
+                            origenR = objectAux.getString("origenSalida");
+                            destinoR = objectAux.getString("destinoSalida");
+                            codigoIATAOrigenR = objectAux.getString("iataCodeOrigenSalida");
+                            codigoIATADestinoR = objectAux.getString("iataCodeDestinoSalida");
+                            aerolineaSalidaR = objectAux.getString("aerolineaSalida");
+                            aerolineaRegresoR = objectAux.getString("aerolineaRegreso");
+
+                            oferta = "\tOpcion "+idOfertaR+".- [Fecha de salida: " + fechaSalidaR + "], [Fecha regreso: " + fechaRegresoR + "]\n";
+                            oferta = oferta + "\t-> Origen: " + origenR + " [" + codigoIATAOrigenR + "].\n";
+                            oferta = oferta + "\t-> Destino: " + destinoR + " [" + codigoIATADestinoR + "].\n";
+                            oferta = oferta + "\t-> Precio: " + precioR + ".\n";
+                            oferta = oferta + "\t-> Aerolinea de ida: " + aerolineaSalidaR + ", vuelo directo: " + vueloDirectoSalidaR + ".\n";
+                            oferta = oferta+ "\t-> Aerolinea de regreso: " + aerolineaRegresoR + ", vuelo directo: " + vueloDirectoRegresoR + ".\n";
+
+                            mapaOfertas.put(idOfertaR,oferta);
+                        }
+                        return true;
+                    }
                 }
+            }else{
+                System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
+                return false;
             }
 
         } catch (AxisFault axisFault) {
@@ -448,10 +460,14 @@ public class Main {
             options.setAction("urn:comprarBillete");
             serviceClient.setOptions(options);
 
-            OMElement response = serviceClient.sendReceive(createPayLoadComprarBillete(oferta,iban,token));
-            JSONObject object = new JSONObject(response.getFirstElement().getText());
-            JSONArray array = object.getJSONArray("ValidationErrors");
-            System.out.println("\n\n\t"+ array.getJSONObject(0).getString("Message"));
+            if(sp.browseService("Orquestador") != null){
+                OMElement response = serviceClient.sendReceive(createPayLoadComprarBillete(oferta,iban,token));
+                JSONObject object = new JSONObject(response.getFirstElement().getText());
+                JSONArray array = object.getJSONArray("ValidationErrors");
+                System.out.println("\n\n\t"+ array.getJSONObject(0).getString("Message"));
+            }else{
+                System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
+            }
 
         } catch (AxisFault axisFault) {
             System.out.println(axisFault.getMessage());
