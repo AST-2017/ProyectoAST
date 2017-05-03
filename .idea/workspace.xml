@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6566f9d3-0fdd-4f2d-94cb-c710ca6d3b9e" name="Default" comment="Modificaciones varias.">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Cliente/src/Main.java" afterPath="$PROJECT_DIR$/Cliente/src/Cliente.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata" afterPath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata.keystream" afterPath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata.keystream" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata.keystream.len" afterPath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata.keystream.len" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata.len" afterPath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata.len" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata.values.at" afterPath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata.values.at" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata_i" afterPath="$PROJECT_DIR$/.idea/dataSources/f4ad0b96-964f-4768-9e67-7fdb55e458ae/_metadata_/metadata_i" />
+    <list default="true" id="6566f9d3-0fdd-4f2d-94cb-c710ca6d3b9e" name="Default" comment="Cambio nombre cliente de Main a Cliente&#10;Se añade control de endpoint de orquestador">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Cliente/src/Browse.java" afterPath="$PROJECT_DIR$/Cliente/src/Browse.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Cliente/src/Cliente.java" afterPath="$PROJECT_DIR$/Cliente/src/Cliente.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -61,11 +55,33 @@
       <file leaf-file-name="Cliente.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Cliente/src/Cliente.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8775">
-              <caret line="585" column="0" lean-forward="true" selection-start-line="585" selection-start-column="0" selection-end-line="585" selection-end-column="0" />
+            <state relative-caret-position="5190">
+              <caret line="346" column="58" lean-forward="false" selection-start-line="346" selection-start-column="58" selection-end-line="346" selection-end-column="58" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Browse.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Cliente/src/Browse.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="217">
+              <caret line="102" column="20" lean-forward="false" selection-start-line="102" selection-start-column="14" selection-end-line="102" selection-end-column="20" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OrquestadorSkeleton.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/WS_Orquestador/src/orquestador/OrquestadorSkeleton.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="217">
+              <caret line="454" column="51" lean-forward="false" selection-start-line="454" selection-start-column="8" selection-end-line="454" selection-end-column="51" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -101,6 +117,9 @@
       <find>tratamientoErrores(</find>
       <find>inc</find>
       <find>Seleccione la opcion que desea comprar:</find>
+      <find>log</find>
+      <find>Logger.getRootLogger().setLevel(Level.OFF);</find>
+      <find>System</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -132,13 +151,13 @@
         <option value="$PROJECT_DIR$/WS_Orquestador/src/orquestador/Publish.java" />
         <option value="$PROJECT_DIR$/WS_Orquestador/resources/Orquestador.wsdl" />
         <option value="$PROJECT_DIR$/WS_Orquestador/resources/services.xml" />
-        <option value="$PROJECT_DIR$/Cliente/src/Browse.java" />
         <option value="$PROJECT_DIR$/WS_Aeropuertos/src/aeropuertos/AeropuertosSkeleton.java" />
         <option value="$PROJECT_DIR$/WS_Vuelos/src/vuelos/VuelosSkeleton.java" />
         <option value="$PROJECT_DIR$/Cliente/src/Main.java" />
         <option value="$PROJECT_DIR$/WS_Banco/src/org/apache/ws/axis2/BancoSkeleton.java" />
         <option value="$PROJECT_DIR$/WS_Orquestador/bbdd/procedimientosAlmacenados.sql" />
         <option value="$PROJECT_DIR$/WS_Orquestador/src/orquestador/OrquestadorSkeleton.java" />
+        <option value="$PROJECT_DIR$/Cliente/src/Browse.java" />
         <option value="$PROJECT_DIR$/Cliente/src/Cliente.java" />
       </list>
     </option>
@@ -184,6 +203,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="WS_Orquestador" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ProyectoAST" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="WS_Orquestador" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="orquestador" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -805,7 +842,7 @@
       <workItem from="1493652653335" duration="3245000" />
       <workItem from="1493688908761" duration="323000" />
       <workItem from="1493736396409" duration="23305000" />
-      <workItem from="1493803547747" duration="498000" />
+      <workItem from="1493803547747" duration="2249000" />
     </task>
     <task id="LOCAL-00001" summary="WS_Vuelos and WS_Aeropuertos modified the limit conexion, &#10;WS_Aeropuertos now returns the response in JSON format">
       <created>1492027509403</created>
@@ -891,11 +928,18 @@
       <option name="project" value="LOCAL" />
       <updated>1493777484154</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Cambio nombre cliente de Main a Cliente&#10;Se añade control de endpoint de orquestador">
+      <created>1493805216756</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1493805216756</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="119475000" />
+    <option name="totallyTimeSpent" value="121226000" />
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -925,7 +969,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21001616" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.07108239" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23109691" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1009,7 +1053,8 @@
     <MESSAGE value="minor fixed." />
     <MESSAGE value="Cliente finalizado." />
     <MESSAGE value="Modificaciones varias." />
-    <option name="LAST_COMMIT_MESSAGE" value="Modificaciones varias." />
+    <MESSAGE value="Cambio nombre cliente de Main a Cliente&#10;Se añade control de endpoint de orquestador" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cambio nombre cliente de Main a Cliente&#10;Se añade control de endpoint de orquestador" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1188,6 +1233,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="32" lean-forward="true" selection-start-line="4" selection-start-column="32" selection-end-line="4" selection-end-column="71" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1291,23 +1337,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/WS_Orquestador/src/orquestador/OrquestadorSkeleton.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="299" column="115" lean-forward="false" selection-start-line="299" selection-start-column="115" selection-end-line="299" selection-end-column="115" />
-          <folding>
-            <element signature="e#3498#3499#0" expanded="false" />
-            <element signature="e#3526#3527#0" expanded="false" />
-            <element signature="e#3910#3911#0" expanded="false" />
-            <element signature="e#3948#3949#0" expanded="false" />
-            <element signature="e#3991#3992#0" expanded="false" />
-            <element signature="e#4029#4030#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="217">
+          <caret line="454" column="51" lean-forward="false" selection-start-line="454" selection-start-column="8" selection-end-line="454" selection-end-column="51" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Cliente/src/Browse.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="232" column="80" lean-forward="false" selection-start-line="232" selection-start-column="80" selection-end-line="232" selection-end-column="80" />
+        <state relative-caret-position="217">
+          <caret line="102" column="20" lean-forward="false" selection-start-line="102" selection-start-column="14" selection-end-line="102" selection-end-column="20" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1316,8 +1355,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Cliente/src/Cliente.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8775">
-          <caret line="585" column="0" lean-forward="true" selection-start-line="585" selection-start-column="0" selection-end-line="585" selection-end-column="0" />
+        <state relative-caret-position="5190">
+          <caret line="346" column="58" lean-forward="false" selection-start-line="346" selection-start-column="58" selection-end-line="346" selection-end-column="58" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

@@ -10,6 +10,8 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -25,7 +27,10 @@ public class Cliente {
     private static Scanner scan = new Scanner(System.in);
     private static Browse sp = new Browse();
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
+        // Desactivar DEBUG
+        Logger.getRootLogger().setLevel(Level.OFF);
+
         // Buscamos al orquestador en UDDI
         endpoint = sp.browseService("Orquestador");
         if(endpoint == null) {
@@ -157,6 +162,7 @@ public class Cliente {
                 return Boolean.valueOf(response.getFirstElement().getText());
             }else{
                 System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
+                System.exit(1);
             }
         } catch (AxisFault axisFault) {
             System.out.println(axisFault.getMessage());
@@ -199,6 +205,7 @@ public class Cliente {
                 return Boolean.valueOf(response.getFirstElement().getText());
             }else{
                 System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
+                System.exit(1);
             }
 
         } catch (AxisFault axisFault) {
@@ -288,6 +295,7 @@ public class Cliente {
                 }
             } else{
                 System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
+                System.exit(1);
             }
         } catch (AxisFault axisFault) {
             System.out.println(axisFault.getMessage());
@@ -313,7 +321,7 @@ public class Cliente {
             for (Map.Entry<Integer,String> entry : mapaOfertas.entrySet()) {
                 System.out.println(entry.getValue() + "\n\n");
             }
-            System.out.println("\n\n\t�Desea comprar algun vuelo?");
+            System.out.println("\n\n\tDesea comprar algun vuelo?");
             System.out.println("\t1. Si.");
             System.out.println("\t2. No");
             System.out.println("\n\n\tOpcion: ");
@@ -336,7 +344,7 @@ public class Cliente {
                     System.out.println("\n\n\tVolviendo al menu principal...");
                     break;
                 default:
-                    System.out.println("\n\n\tOpci�n no v�lida, volviendo al menu principal...");
+                    System.out.println("\n\n\tOpcion no valida, volviendo al menu principal...");
                     break;
             }
         }
@@ -432,13 +440,14 @@ public class Cliente {
                 }
             }else{
                 System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
-                return false;
+                System.exit(1);
             }
 
         } catch (AxisFault axisFault) {
             System.out.println(axisFault.getMessage());
             return false;
         }
+        return false;
     }
 
     private static void comprarBillete(int oferta, String iban, String token){
@@ -467,6 +476,7 @@ public class Cliente {
                 System.out.println("\n\n\t"+ array.getJSONObject(0).getString("Message"));
             }else{
                 System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
+                System.exit(1);
             }
 
         } catch (AxisFault axisFault) {

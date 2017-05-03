@@ -100,7 +100,7 @@ public class Browse {
 
 			// Making API call that retrieves the authentication token for the user.
 			AuthToken rootAuthToken = security.getAuthToken(getAuthTokenRoot);
-			System.out.println(username + " AUTHTOKEN = (don't log auth tokens!");
+			//System.out.println(username + " AUTHTOKEN = (don't log auth tokens!");
 			
 			return rootAuthToken.getAuthInfo();
 	
@@ -142,10 +142,10 @@ public class Browse {
 		else {
 			
 			for (int i = 0; i < businessInfos.getBusinessInfo().size(); i++) {
-				System.out.println("\n===========================================================");
+				/*System.out.println("\n===========================================================");
 				System.out.println("Business Name: " + ListToString(businessInfos.getBusinessInfo().get(i).getName()));
 				System.out.println("Business Key: "+ businessInfos.getBusinessInfo().get(i).getBusinessKey());
-				System.out.println("Services:");
+				System.out.println("Services:");*/
 				
 				if(businessInfos.getBusinessInfo().get(i).getServiceInfos() == null)
 					System.out.println("No services found.");
@@ -161,12 +161,12 @@ public class Browse {
 	// Print List Service Name and Service Key
 	private void PrintServiceInfo(ServiceInfos serviceInfos) {
 		
-		for (int i = 0; i < serviceInfos.getServiceInfo().size(); i++) {
+		/*for (int i = 0; i < serviceInfos.getServiceInfo().size(); i++) {
 			System.out.println("-------------------------------------------");
 			System.out.println("Name: " + ListToString(serviceInfos.getServiceInfo().get(i).getName()));
 			System.out.println("Service Key: " + serviceInfos.getServiceInfo().get(i).getServiceKey());
 			
-		}
+		}*/
 	}
 	
 	
@@ -184,14 +184,14 @@ public class Browse {
 					gsd.getServiceKey().add(businessInfos.getBusinessInfo().get(i).getServiceInfos().getServiceInfo().get(k).getServiceKey());
 
 				gsd.setAuthInfo(token);
-				System.out.println("Fetching data for business " + businessInfos.getBusinessInfo().get(i).getBusinessKey()+"\n");
+				//System.out.println("Fetching data for business " + businessInfos.getBusinessInfo().get(i).getBusinessKey()+"\n");
 				ServiceDetail serviceDetail = inquiry.getServiceDetail(gsd);
 			
 				for (int k = 0; k < serviceDetail.getBusinessService().size(); k++) {
 					PrintServiceDetail(serviceDetail.getBusinessService().get(k));
 				}
 			
-				System.out.println("................");
+				//System.out.println("................");
 
 			}
 				
@@ -207,7 +207,7 @@ public class Browse {
 			return;
 		}
 		
-		System.out.println("\nService Name: " + ListToString(get.getName()));
+		//System.out.println("\nService Name: " + ListToString(get.getName()));
 		for (int i = 0; i < get.getName().size(); i++) {
 
 			if((get.getName().get(i).getValue()).equals(ServiceName))
