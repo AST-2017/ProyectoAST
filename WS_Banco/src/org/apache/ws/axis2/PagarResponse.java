@@ -54,15 +54,13 @@ public class PagarResponse implements org.apache.axis2.databinding.ADBBean {
 
     public void serialize(final javax.xml.namespace.QName parentQName,
         javax.xml.stream.XMLStreamWriter xmlWriter)
-        throws javax.xml.stream.XMLStreamException,
-            org.apache.axis2.databinding.ADBException {
+        throws javax.xml.stream.XMLStreamException {
         serialize(parentQName, xmlWriter, false);
     }
 
     public void serialize(final javax.xml.namespace.QName parentQName,
         javax.xml.stream.XMLStreamWriter xmlWriter, boolean serializeType)
-        throws javax.xml.stream.XMLStreamException,
-            org.apache.axis2.databinding.ADBException {
+        throws javax.xml.stream.XMLStreamException {
         java.lang.String prefix = null;
         java.lang.String namespace = null;
 

@@ -60,9 +60,9 @@ public class Browse {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	
+
+
+
 	/* --------------------------------------- METODOS --------------------------------------- */
 
 	
@@ -86,9 +86,9 @@ public class Browse {
 		return endpoint;
 		
 	}
-	
-	
-	
+
+
+
 	// Gets a UDDI style auth token
 	private String GetAuthKey(String username, String password) {
 
@@ -111,7 +111,7 @@ public class Browse {
 		return null;
 	}
 
-	
+
 
 	// Search for business
 	private BusinessList GetBusinessList(String token) throws Exception {
@@ -209,7 +209,7 @@ public class Browse {
 		
 		System.out.println("\nService Name: " + ListToString(get.getName()));
 		for (int i = 0; i < get.getName().size(); i++) {
-			//TODO WTF.
+
 			if((get.getName().get(i).getValue()).equals(ServiceName))
 				PrintBindingTemplates(get.getBindingTemplates());
 			

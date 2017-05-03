@@ -44,6 +44,17 @@ public class Pagar implements org.apache.axis2.databinding.ADBBean {
     protected boolean localDestinatarioTracker = false;
 
     /**
+     * field for Mensaje
+     */
+    protected java.lang.String localMensaje;
+
+    /*  This tracker boolean wil be used to detect whether the user called the set method
+     *   for this attribute. It will be used to determine whether to include this field
+     *   in the serialized XML
+     */
+    protected boolean localMensajeTracker = false;
+
+    /**
      * Auto generated getter method
      * @return int
      */
@@ -113,6 +124,28 @@ public class Pagar implements org.apache.axis2.databinding.ADBBean {
         this.localDestinatario = param;
     }
 
+    public boolean isMensajeSpecified() {
+        return localMensajeTracker;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.lang.String
+     */
+    public java.lang.String getMensaje() {
+        return localMensaje;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param Mensaje
+     */
+    public void setMensaje(java.lang.String param) {
+        localMensajeTracker = true;
+
+        this.localMensaje = param;
+    }
+
     /**
      *
      * @param parentQName
@@ -129,15 +162,13 @@ public class Pagar implements org.apache.axis2.databinding.ADBBean {
 
     public void serialize(final javax.xml.namespace.QName parentQName,
         javax.xml.stream.XMLStreamWriter xmlWriter)
-        throws javax.xml.stream.XMLStreamException,
-            org.apache.axis2.databinding.ADBException {
+        throws javax.xml.stream.XMLStreamException {
         serialize(parentQName, xmlWriter, false);
     }
 
     public void serialize(final javax.xml.namespace.QName parentQName,
         javax.xml.stream.XMLStreamWriter xmlWriter, boolean serializeType)
-        throws javax.xml.stream.XMLStreamException,
-            org.apache.axis2.databinding.ADBException {
+        throws javax.xml.stream.XMLStreamException {
         java.lang.String prefix = null;
         java.lang.String namespace = null;
 
@@ -212,6 +243,22 @@ public class Pagar implements org.apache.axis2.databinding.ADBBean {
                     xmlWriter);
             } else {
                 xmlWriter.writeCharacters(localDestinatario);
+            }
+
+            xmlWriter.writeEndElement();
+        }
+
+        if (localMensajeTracker) {
+            namespace = "http://ws.apache.org/axis2";
+            writeStartElement(null, namespace, "mensaje", xmlWriter);
+
+            if (localMensaje == null) {
+                // write the nil attribute
+                writeAttribute("xsi",
+                    "http://www.w3.org/2001/XMLSchema-instance", "nil", "1",
+                    xmlWriter);
+            } else {
+                xmlWriter.writeCharacters(localMensaje);
             }
 
             xmlWriter.writeEndElement();
@@ -601,6 +648,34 @@ public class Pagar implements org.apache.axis2.databinding.ADBBean {
                         java.lang.String content = reader.getElementText();
 
                         object.setDestinatario(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                                content));
+                    } else {
+                        reader.getElementText(); // throw away text nodes if any.
+                    }
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if ((reader.isStartElement() &&
+                        new javax.xml.namespace.QName(
+                            "http://ws.apache.org/axis2", "mensaje").equals(
+                            reader.getName())) ||
+                        new javax.xml.namespace.QName("", "mensaje").equals(
+                            reader.getName())) {
+                    nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance",
+                            "nil");
+
+                    if (!"true".equals(nillableValue) &&
+                            !"1".equals(nillableValue)) {
+                        java.lang.String content = reader.getElementText();
+
+                        object.setMensaje(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
                                 content));
                     } else {
                         reader.getElementText(); // throw away text nodes if any.

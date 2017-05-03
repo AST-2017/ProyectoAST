@@ -24,15 +24,16 @@ public class Main {
     private static String endpoint;
     private static Scanner scan = new Scanner(System.in);
 
-    public static void main(String[] args) throws AxisFault {
+    public static void main(String[] args){
     	// Buscamos al orquestador en UDDI
     	Browse sp = new Browse();
 		endpoint = sp.browseService("Orquestador");
     	
 		if(endpoint == null) {
-			System.out.println("No se ha encontrado el servicio: Orquestador (endpoint: "+endpoint+")");
+			System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
 			System.exit(1);
-		}   	
+		}
+
 
         int opcion;
         while (true){
@@ -313,7 +314,7 @@ public class Main {
                 case 1:
                     System.out.println("\n\n\tSeleccione la opcion que desea comprar:");
                     int opcion = Integer.parseInt(scan.nextLine());
-                    if (opcion > 0 && opcion < mapaOfertas.size()){
+                    if (opcion > 0 && opcion <= mapaOfertas.size()){
                         System.out.println("A seleccionado la opcion de compra: " + opcion);
                         System.out.println("Se va a proceder a la compra...");
                         System.out.println("\n\nIngrese su IBAN: ");
@@ -448,15 +449,10 @@ public class Main {
             serviceClient.setOptions(options);
 
             OMElement response = serviceClient.sendReceive(createPayLoadComprarBillete(oferta,iban,token));
+            JSONObject object = new JSONObject(response.getFirstElement().getText());
+            JSONArray array = object.getJSONArray("ValidationErrors");
+            System.out.println("\n\n\t"+ array.getJSONObject(0).getString("Message"));
 
-            if (Boolean.valueOf(response.getFirstElement().getText())){
-                System.out.println("¡Muchas gracias por su compra!");
-                System.out.println("Su pago se ha realizado con exito, recibirá una confirmación de pago al email.");
-                System.out.println("Puede ver su nueva reserva en nuestro apartado \"Ver resrevas\".");
-            }else {
-                System.out.println("Disculpe las molestias, no se ha podido realizar el pago de su reserva, " +
-                        "le llegará un mensaje informativo a su email.");
-            }
         } catch (AxisFault axisFault) {
             System.out.println(axisFault.getMessage());
         }

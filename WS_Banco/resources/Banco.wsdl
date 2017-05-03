@@ -9,6 +9,7 @@
                       <xs:element name="cuentaOrigen" type="xs:int"/>
                       <xs:element name="cuentaDestino" type="xs:int"/>
                       <xs:element minOccurs="0" name="destinatario" nillable="true" type="xs:string"/>
+                      <xs:element minOccurs="0" name="mensaje" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>

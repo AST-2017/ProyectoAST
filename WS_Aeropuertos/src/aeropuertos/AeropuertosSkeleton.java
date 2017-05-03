@@ -23,6 +23,11 @@ import org.json.XML;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -40,7 +45,26 @@ public class AeropuertosSkeleton implements ServiceLifeCycle{
 
     public void startUp(ConfigurationContext context, AxisService service) {
         String servicio = "Aeropuertos";
-        String endpoint = "http://192.168.43.199:8081/axis2/services/Aeropuertos";
+        String interfaceName = "en0";
+        String ip="";
+        NetworkInterface networkInterface;
+
+        try {
+            networkInterface = NetworkInterface.getByName(interfaceName);
+            Enumeration<InetAddress> inetAddress = networkInterface.getInetAddresses();
+            InetAddress currentAddress;
+            while (inetAddress.hasMoreElements()) {
+                currentAddress = inetAddress.nextElement();
+                if (currentAddress instanceof Inet4Address && !currentAddress.isLoopbackAddress()) {
+                    ip = currentAddress.toString();
+                    break;
+                }
+            }
+        } catch (SocketException e) {
+            System.out.println(e.getMessage());
+        }
+
+        String endpoint = "http:/"+ip+":8081/axis2/services/Aeropuertos";
         sp.publish(servicio, endpoint);
     }
 

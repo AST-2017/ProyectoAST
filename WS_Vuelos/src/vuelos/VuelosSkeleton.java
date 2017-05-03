@@ -7,18 +7,18 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 /**
  * VuelosSkeleton java skeleton for the axisService
@@ -55,7 +55,26 @@ public class VuelosSkeleton implements ServiceLifeCycle{
 
     public void startUp(ConfigurationContext context, AxisService service) {
         String servicio = "Vuelos";
-        String endpoint = "http://192.168.43.199:8081/axis2/services/Vuelos";
+        String interfaceName = "en0";
+        String ip="";
+        NetworkInterface networkInterface;
+
+        try {
+            networkInterface = NetworkInterface.getByName(interfaceName);
+            Enumeration<InetAddress> inetAddress = networkInterface.getInetAddresses();
+            InetAddress currentAddress;
+            while (inetAddress.hasMoreElements()) {
+                currentAddress = inetAddress.nextElement();
+                if (currentAddress instanceof Inet4Address && !currentAddress.isLoopbackAddress()) {
+                    ip = currentAddress.toString();
+                    break;
+                }
+            }
+        } catch (SocketException e) {
+            System.out.println(e.getMessage());
+        }
+
+        String endpoint = "http:/"+ip+":8081/axis2/services/Vuelos";
         sp.publish(servicio, endpoint);
     }
 
@@ -101,34 +120,71 @@ public class VuelosSkeleton implements ServiceLifeCycle{
      * @param outboundDate       fecha de salida.
      * @param inboundDate        fecha de regreso.
      * @return respuesta de la consulta en formato JSON.
-     * @throws IOException para posibles errores con la consulta al servicio REST.
      */
     private static String getResponseSkyScanner(String originAirport, String destinationAirport, String outboundDate,
-                                               String inboundDate) throws IOException {
+                                               String inboundDate){
         Logger.getRootLogger().setLevel(Level.OFF);
         String response = "";
+        String aux;
         String request = originAirport + "/" + destinationAirport + "/" + outboundDate + "/" + inboundDate;
-        URL url = new URL("http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/ES/eur/es-ES/"
-                + request + "?apikey=prtl6749387986743898559646983194");
+        URL url;
+        BufferedReader bufferedReader;
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Accept", "application/json");
+        try {
+            url = new URL("http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/ES/eur/es-ES/"
+                    + request + "?apikey=prtl6749387986743898559646983194");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
 
-        if (connection.getResponseCode() != 200) {
-            response = "{\n" +
-                    "  \"ValidationErrors\": [\n" +
-                    "    {\n" +
-                    "      \"Message\": \"400 Bad Request\"\n" +
-                    "    }\n" +
-                    "  ]\n" +
-                    "}";
-        } else {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String aux;
-            while ((aux = bufferedReader.readLine()) != null) response = response + aux;
+            switch (connection.getResponseCode()){
+                case 200:
+                    bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    while ((aux = bufferedReader.readLine()) != null) response = response + aux;
+
+                    break;
+                default:
+                    bufferedReader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                    while ((aux = bufferedReader.readLine()) != null) response = response + aux;
+
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("ValidationErrors");
+                    JSONObject object = jsonArray.getJSONObject(0);
+                    String mensaje = object.getString("Message");
+
+                    if (mensaje.equals("Date in the past")){
+                        switch (jsonArray.length()){
+                            case 1:
+                                if (object.getString("ParameterName").equals("OutboundDate"))
+                                    response = tratamientoErrores("Valor incorrecto en la fecha de salida " +
+                                            object.getString("ParameterValue") + " [fecha en el pasado].");
+                                else
+                                    response = tratamientoErrores("Valor incorrecto en la fecha de regreso " +
+                                            object.getString("ParameterValue") + " [fecha en el pasado].");
+                                break;
+                            default:
+                                response = tratamientoErrores("Valores incorrectos en la fecha de salida "
+                                        + outboundDate + " y en la fecha de regreso " + inboundDate + " [fechas en el pasado].");
+                                break;
+                        }
+                    }else{
+                        if (mensaje.contains("must be later"))
+                            response = tratamientoErrores("Valores incorrectos, la fecha de regreso "
+                                    +inboundDate+" debe ser posterior a la de salida "+outboundDate+".");
+                        else
+                            if (mensaje.contains("Incorrect date format"))
+                                response = tratamientoErrores("Formato de fecha incorrecta, recuerde [aaaa-mm-dd], ejemplo: 2017-09-10");
+                            else
+                                response = tratamientoErrores(mensaje);
+                    }
+
+                    break;
+            }
+
+            connection.disconnect();
+        } catch (IOException e) {
+            return tratamientoErrores(e.getMessage());
         }
-        connection.disconnect();
 
         return response;
     }
@@ -399,5 +455,21 @@ public class VuelosSkeleton implements ServiceLifeCycle{
         }
 
         return aerolinea;
+    }
+
+    /**
+     * Método usado para crear mensajes JSON de aviso de errores.
+     *
+     * @param mensaje mensaje de error personalizaco.
+     * @return el error en formato JSON.
+     */
+    private static String tratamientoErrores(String mensaje){
+        return "{\n" +
+                "  \"ValidationErrors\": [\n" +
+                "    {\n" +
+                "      \"Message\": \""+mensaje+"\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
     }
 }

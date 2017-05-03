@@ -290,3 +290,31 @@ CREATE PROCEDURE obtenerPrecioOferta(IN _dni CHAR(9), IN _id_oferta_vuelo INTEGE
     END IF;
   END //
 DELIMITER ;
+
+
+/*
+Procedimiento almacenado buscarOferta: usado para mandar el mensaje al banco
+ */
+DELIMITER //
+CREATE PROCEDURE buscarOferta(IN _dni CHAR(9), IN _id_oferta_vuelo INT)
+BEGIN
+  SELECT
+    clientes.nombre,
+    clientes.apellido1,
+    clientes.apellido2,
+    ofertas.precio,
+    ofertas.vueloDirectoSalida,
+    ofertas.vueloDirectoRegreso,
+    ofertas.fechaSalida,
+    ofertas.fechaRegreso,
+    ofertas.origen,
+    ofertas.destino,
+    ofertas.aerolineaSalida,
+    ofertas.aerolineaRegreso
+  FROM clientes,ofertas
+  WHERE
+    clientes.dni = _dni AND
+    ofertas.id_cliente = clientes.id AND
+    ofertas.id_oferta_vuelo = _id_oferta_vuelo;
+END //
+DELIMITER ;

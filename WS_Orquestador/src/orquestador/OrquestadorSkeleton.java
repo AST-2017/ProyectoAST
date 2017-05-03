@@ -27,8 +27,13 @@ import org.json.JSONObject;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 @SuppressWarnings("Duplicates")
 @WebService
@@ -59,7 +64,26 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
 
     public void startUp(ConfigurationContext context, AxisService service) {
         String servicio = "Orquestador";
-        String endpointOrquestador = "http://192.168.43.199:8081/axis2/services/Orquestador";
+        String interfaceName = "en0";
+        String ip="";
+        NetworkInterface networkInterface;
+
+        try {
+            networkInterface = NetworkInterface.getByName(interfaceName);
+            Enumeration<InetAddress> inetAddress = networkInterface.getInetAddresses();
+            InetAddress currentAddress;
+            while (inetAddress.hasMoreElements()) {
+                currentAddress = inetAddress.nextElement();
+                if (currentAddress instanceof Inet4Address && !currentAddress.isLoopbackAddress()) {
+                    ip = currentAddress.toString();
+                    break;
+                }
+            }
+        } catch (SocketException e) {
+            System.out.println(e.getMessage());
+        }
+
+        String endpointOrquestador = "http:/"+ip+":8081/axis2/services/Orquestador";
         sp.publish(servicio, endpointOrquestador);
     }
 
@@ -194,7 +218,6 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
     public orquestador.ComprarBilleteResponse comprarBillete(orquestador.ComprarBillete comprarBillete) throws AxisFault{
         limpiarVariables();
         ComprarBilleteResponse comprarBilleteResponse = new ComprarBilleteResponse();
-        comprarBilleteResponse.setConfirmacion(false);
         int id_oferta = Integer.parseInt(comprarBillete.getId_oferta());
         String dni = comprarBillete.getDni();
         String iban = comprarBillete.getIban();
@@ -203,6 +226,13 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
         String cuentaDestino = "12345678";
         int importe = 0;
         String endpointBanco = browse.browseService("Banco");
+
+        if (endpointBanco == null){
+            comprarBilleteResponse.setConfirmacion(
+                    tratamientoErrores("Error. El servicio web Banco no se encuentra disponible."));
+
+            return comprarBilleteResponse;
+        }
 
         try {
             // Register JDBC driver
@@ -228,7 +258,6 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
             while (resultSet.next()) email = resultSet.getString("email");
             obtenerEmail.close();
 
-            //TODO insertar aquí la comunicación y posterior respuesta del servicio Banco.
             ServiceClient servicioVuelos = new ServiceClient();
             Options opciones = new Options();
             MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
@@ -252,7 +281,8 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
             header.setText(token+"-"+iban);
             servicioVuelos.addHeader(header);
 
-            OMElement response = servicioVuelos.sendReceive(createPayLoadBanco(String.valueOf(importe),iban,cuentaDestino,email));
+            OMElement response = servicioVuelos.sendReceive(
+                    createPayLoadBanco(String.valueOf(importe),iban,cuentaDestino,email,id_oferta,dni));
 
             // Si el pago se realizo correctamente
             if(Boolean.valueOf(response.getFirstElement().getText())){
@@ -266,12 +296,12 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
 
               insertarReserva.close();
               connection.close();
-              comprarBilleteResponse.setConfirmacion(true);
+              comprarBilleteResponse.setConfirmacion(
+                      tratamientoErrores("Muchas gracias por su compra! Su pago se ha realizado con exito, recibira una confirmacion de pago al email."));
             }
-          }catch (SQLException e){
-              System.out.println(e.getMessage());
-          } catch (ClassNotFoundException e) {
-              e.printStackTrace();
+          }catch (SQLException | ClassNotFoundException e){
+              comprarBilleteResponse.setConfirmacion(
+                      tratamientoErrores("Disculpe las molestias, no se ha podido realizar el pago de su reserva, le llegara un mensaje informativo a su email."));
           }
 
         return comprarBilleteResponse;
@@ -429,8 +459,24 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
         String fechaRegreso = obtenerOfertas.getFechaRegreso();
         String dni = obtenerOfertas.getDni();
         String endpointVuelos = browse.browseService("Vuelos");
+        String endpointAeropuertos = browse.browseService("Aeropuertos");
 
-        int opcion = obtenerCodigosIATA();
+        if (endpointVuelos == null || endpointAeropuertos == null){
+            if (endpointVuelos != null && endpointAeropuertos == null)
+                obtenerOfertasResponse.setOfertas(
+                        tratamientoErrores("Error. El Servicio Web Aeropuertos no se encuentra disponible."));
+            else {
+                if (endpointAeropuertos != null && endpointVuelos == null)
+                    obtenerOfertasResponse.setOfertas(
+                            tratamientoErrores("Error. El Servicio Web Vuelos no se encuentra disponible."));
+                else
+                    obtenerOfertasResponse.setOfertas(
+                            tratamientoErrores("Error. Los Servicios Web Aeropuertos y Vuelos no se encuentran disponibles."));
+            }
+            return obtenerOfertasResponse;
+        }
+
+        int opcion = obtenerCodigosIATA(endpointAeropuertos);
         switch (opcion){
             case 1:
                 //uso de BBDD
@@ -624,10 +670,7 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
     *          -> 1 si se ha usado la base de datos para obtener los codigos iata
     *          -> 2 si se ha usado el servicio externo webservicesX.
     */
-   private static int obtenerCodigosIATA() throws AxisFault, ClassNotFoundException, SQLException, InterruptedException {
-
-       String endpointAeropuertos = browse.browseService("Aeropuertos");
-
+   private static int obtenerCodigosIATA(String endpointAeropuertos) throws AxisFault, ClassNotFoundException, SQLException, InterruptedException {
        boolean origenExiste = false, destinoExiste = false;
 
        ServiceClient servicioAeropuertos = new ServiceClient();
@@ -754,11 +797,74 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
      * @return el cuerpo del mensaje SOAP
      */
 
-    private static OMElement createPayLoadBanco(String importe,String iban, String cuentaDestino,String email){
+    private static OMElement createPayLoadBanco(
+            String importe,String iban, String cuentaDestino,String email,int idOferta, String dniCliente){
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace omNs = fac.createOMNamespace("http://ws.apache.org/axis2", "ns");
         OMElement method = fac.createOMElement("pagar", omNs);
+        String nombre = "";
+        String apellido1 = "";
+        String apellido2 = "";
+        int precio = 0;
+        String vueloDirectoSalida = "";
+        String vueloDirectoRegreso = "";
+        String fechaSalida = "";
+        String fechaRegreso = "";
+        String origen = "";
+        String destino = "";
+        String aerolineaSalida = "";
+        String aerolineaRegreso = "";
+        String mensajeEmail = "";
 
+        try {
+            // Register JDBC driver
+            Class.forName(JDBC_DRIVER);
+
+            //Open connection
+            Connection connection = DriverManager.getConnection(url,user,password);
+
+            //language=MySQL
+            String sql = "{CALL buscarOferta(?,?)}";
+            CallableStatement buscarOferta = connection.prepareCall(sql);
+            buscarOferta.setString(1,dniCliente);
+            buscarOferta.setInt(2,idOferta);
+
+            ResultSet resultSet = buscarOferta.executeQuery();
+            while (resultSet.next()){
+                nombre = resultSet.getString("nombre");
+                apellido1 = resultSet.getString("apellido1");
+                apellido2 = resultSet.getString("apellido2");
+                precio = resultSet.getInt("precio");
+                if (resultSet.getBoolean("vueloDirectoSalida")) vueloDirectoSalida = "Si";
+                else vueloDirectoSalida = "No";
+                if (resultSet.getBoolean("vueloDirectoRegreso")) vueloDirectoRegreso = "Si";
+                else vueloDirectoRegreso = "No";
+                fechaSalida = resultSet.getString("fechaSalida");
+                fechaRegreso = resultSet.getString("fechaRegreso");
+                origen = resultSet.getString("origen");
+                destino = resultSet.getString("destino");
+                aerolineaSalida = resultSet.getString("aerolineaSalida");
+                aerolineaRegreso = resultSet.getString("aerolineaRegreso");
+            }
+
+            buscarOferta.close();
+            connection.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        mensajeEmail = "Hola " + nombre + " " + apellido1 + " " + apellido2 + " su reserva se ha realizado con exito.\n\n\n"+
+                "Detalles de la reserva:\n\n"+
+                "Precio: " + precio + ".\n" +
+                "Fecha de salida: " + fechaSalida + ".\n" +
+                "Fecha de regreso: " + fechaRegreso + ".\n" +
+                "Origen: " + origen + ".\n" +
+                "Destino: " + destino + ".\n" +
+                "Aerolinea de ida: " + aerolineaSalida + ", vuelo directo de ida: " + vueloDirectoSalida + ".\n" +
+                "Aerolinea de regreso: " + aerolineaRegreso + ", vuelo directo de regreso: " + vueloDirectoRegreso + ".\n" +
+                "\n\n\n\nPara cualquiere duda puede contactar con el equipo de atencion al cliente en el correo: proyectoast2017@gmail.com";
         // Importe
         OMElement im = fac.createOMElement("importe", omNs);
         im.setText(importe);
@@ -775,6 +881,11 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
         OMElement des = fac.createOMElement("destinatario", omNs);
         des.setText(email);
         method.addChild(des);
+        // Mensaje:
+        OMElement mensaje = fac.createOMElement("mensaje",omNs);
+        mensaje.setText(mensajeEmail);
+        method.addChild(mensaje);
+
 
         return method;
     }

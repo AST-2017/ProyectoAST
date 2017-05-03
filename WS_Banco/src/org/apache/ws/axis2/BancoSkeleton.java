@@ -10,20 +10,45 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.ServiceLifeCycle;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.sql.*;
+import java.util.Enumeration;
 
 /**
  *  BancoSkeleton java skeleton for the axisService
  */
+@SuppressWarnings("Duplicates")
 public class BancoSkeleton implements ServiceLifeCycle{
   private final static String usuario = "ast";
-	private final static String contra = "ast";
-	private final static String bd = "banco";
+  private final static String contra = "ast";
+  private final static String bd = "banco";
   private final static Publish sp = new Publish();
 
   public void startUp(ConfigurationContext context, AxisService service) {
     String servicio = "Banco";
-    String endpoint = "http://192.168.43.199:8081/axis2/services/Banco";
+    String interfaceName = "en0";
+    String ip="";
+    NetworkInterface networkInterface;
+
+    try {
+      networkInterface = NetworkInterface.getByName(interfaceName);
+      Enumeration<InetAddress> inetAddress = networkInterface.getInetAddresses();
+      InetAddress currentAddress;
+      while (inetAddress.hasMoreElements()) {
+        currentAddress = inetAddress.nextElement();
+        if (currentAddress instanceof Inet4Address && !currentAddress.isLoopbackAddress()) {
+          ip = currentAddress.toString();
+          break;
+        }
+      }
+    } catch (SocketException e) {
+      System.out.println(e.getMessage());
+    }
+
+    String endpoint = "http:/"+ip+":8081/axis2/services/Banco";
     sp.publish(servicio, endpoint);
   }
 
@@ -42,6 +67,8 @@ public class BancoSkeleton implements ServiceLifeCycle{
       int cuentaOrigen = pagar.getCuentaOrigen();
       int cuentaDestino = pagar.getCuentaDestino();
       String destinatario = pagar.getDestinatario();
+      String mensaje = pagar.getMensaje();
+
       Connection conn = null;
       Statement stmt = null;
       ResultSet rso = null, rsd = null;
@@ -69,7 +96,7 @@ public class BancoSkeleton implements ServiceLifeCycle{
 
         // Comprobar si existen ambas cuentas y si la cuenta origen tiene el importe a pagar
         if (saldoOrigen == -1 || saldoDestino == -1 || importe > saldoOrigen) {
-          mail.enviar(destinatario, "Se ha producido un error: La cuenta es valida o no tiene saldo suficiente.");
+          mail.enviar(destinatario, "Se ha producido un error: La cuenta no es valida o no tiene saldo suficiente.");
           pr.set_return(false);
           return pr;
         } else {// Realizar transaccion
@@ -84,7 +111,7 @@ public class BancoSkeleton implements ServiceLifeCycle{
         rsd.close();
         stmt.close();
         conn.close();
-        mail.enviar(destinatario, "Pago realizado correctamente");
+        mail.enviar(destinatario, mensaje);
         pr.set_return(true);
         return pr;
       } catch (SQLException e) {
