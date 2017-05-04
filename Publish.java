@@ -1,6 +1,6 @@
 package orquestador;
 
-// CHANGE PACKEGE AND PATH TO uddi.xml
+// CHANGE PACKAGE AND PATH TO uddi.xml
 
 import java.util.List;
 import java.util.Scanner;
