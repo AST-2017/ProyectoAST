@@ -3,6 +3,7 @@ package orquestador;
 // CHANGE PACKAGE AND PATH TO uddi.xml
 
 import java.util.List;
+import java.io.File;
 
 import org.uddi.api_v3.*;
 import org.uddi.v3_service.UDDIInquiryPortType;
