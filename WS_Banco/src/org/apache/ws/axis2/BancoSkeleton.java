@@ -29,26 +29,15 @@ public class BancoSkeleton implements ServiceLifeCycle{
 
   public void startUp(ConfigurationContext context, AxisService service) {
     String servicio = "Banco";
-    String interfaceName = "en0";
-    String ip="";
-    NetworkInterface networkInterface;
+    String ip = "";
 
     try {
-      networkInterface = NetworkInterface.getByName(interfaceName);
-      Enumeration<InetAddress> inetAddress = networkInterface.getInetAddresses();
-      InetAddress currentAddress;
-      while (inetAddress.hasMoreElements()) {
-        currentAddress = inetAddress.nextElement();
-        if (currentAddress instanceof Inet4Address && !currentAddress.isLoopbackAddress()) {
-          ip = currentAddress.toString();
-          break;
-        }
-      }
-    } catch (SocketException e) {
-      System.out.println(e.getMessage());
-    }
+			ip = InetAddress.getLocalHost().getHostAddress();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-    String endpoint = "http:/"+ip+":8081/axis2/services/Banco";
+    String endpoint = "http://"+ip+":8081/axis2/services/Banco";
     sp.publish(servicio, endpoint);
   }
 

@@ -25,33 +25,43 @@ public class Cliente {
     private static TreeMap<Integer,String> mapaOfertas = new TreeMap<>();
     private static String endpoint;
     private static Scanner scan = new Scanner(System.in);
-    private static Browse sp = new Browse();
+    private static Browse sp;
 
     public static void main(String[] args) {
+        if (args.length == 0){
+            System.out.println("\n\nNumero de argumentos introducidos erroneos.\n" +
+                    "Para ejecutar: java -jar Cliente.jar ruta-al-fichero-udi.xml");
+            System.exit(-1);
+        }
         // Desactivar DEBUG
         Logger.getRootLogger().setLevel(Level.OFF);
+        sp = new Browse(args[0]);
 
         // Buscamos al orquestador en UDDI
         endpoint = sp.browseService("Orquestador");
         if(endpoint == null) {
             System.out.println("Error. El servicio web Orquestador no se encuentra disponible.");
-            System.exit(1);
+            System.exit(0);
         }
 
-        int opcion;
+        String opcion;
         while (true){
             System.out.println("\n\n\tBIENVENIDO A NUESTRO SERVICIO DE VUELOS NACIONALES\n\n");
             System.out.println("\t1.- Iniciar sesion.");
             System.out.println("\t2.- Registrarse.");
-            System.out.println("\n\nSeleccione una opcion: ");
-            opcion = Integer.parseInt(scan.nextLine());
+            System.out.println("\t3.- Salir.");
+            System.out.print("\n\nSeleccione una opcion: ");
+            opcion = scan.nextLine();
             switch (opcion){
-                case 1: //Iniciar sesion.
+                case "1": //Iniciar sesion.
                     if (iniciarSesion())
                         menuPrincipal();
                     break;
-                case 2: //Registrarse.
+                case "2": //Registrarse.
                     registrarse();
+                    break;
+                case "3":
+                    System.exit(0);
                     break;
                 default: //Opcion no valida.
                     System.out.println("\n\n\tOpcion no valida, volviendo al inicio...");
@@ -62,11 +72,11 @@ public class Cliente {
 
     private static boolean iniciarSesion(){
         System.out.println("\n\n\tBIENVENIDO AL INICIO DE SESION DE NUESTRA PLATAFORMA.");
-        System.out.println("\n\tINSERTE LOS SIGUIENTES DATOS:");
+        System.out.print("\n\tINSERTE LOS SIGUIENTES DATOS:");
 
-        System.out.println("\tUsuario(dni): ");
+        System.out.print("\n\tUsuario(dni): ");
         dniCliente = scan.nextLine();
-        System.out.println("\tContrasena: ");
+        System.out.print("\n\tContrasena: ");
         password = scan.nextLine();
 
         if (dniCliente.length() == 9){
@@ -82,21 +92,21 @@ public class Cliente {
 
     private static void registrarse(){
         System.out.println("\n\n\tBIENVENIDO AL REGISTRO DE NUESTRA PLATAFORMA.");
-        System.out.println("\n\tINSERTE LOS SIGUIENTES DATOS:");
+        System.out.print("\n\tINSERTE LOS SIGUIENTES DATOS:");
 
-        System.out.println("\tNombre: ");
+        System.out.print("\n\tNombre: ");
         String nombreTemp = scan.nextLine();
-        System.out.println("\tPrimer apellido: ");
+        System.out.print("\n\tPrimer apellido: ");
         String apellido1Temp = scan.nextLine();
-        System.out.println("\tSegundo apellido: ");
+        System.out.print("\n\tSegundo apellido: ");
         String apellido2Temp = scan.nextLine();
-        System.out.println("\tDNI: ");
+        System.out.print("\n\tDNI: ");
         String dniTemp = scan.nextLine();
-        System.out.println("\tCorreo electronico: ");
+        System.out.print("\n\tCorreo electronico: ");
         String emailTemp = scan.nextLine();
-        System.out.println("\tTelefono de contacto: ");
+        System.out.print("\n\tTelefono de contacto: ");
         String telefonoTemp = scan.nextLine();
-        System.out.println("\tContrasena: ");
+        System.out.print("\n\tContrasena: ");
         String passTemp = scan.nextLine();
 
         if (dniTemp.length() == 9){
@@ -109,24 +119,24 @@ public class Cliente {
     }
 
     private static void menuPrincipal(){
-        int opcion;
+        String opcion;
         while (true){
             System.out.println("\n\n\tBIENVENIDO A NUESTRO SERVICIO DE VUELOS NACIONALES\n\n");
             System.out.println("\t1.- Buscar vuelos.");
             System.out.println("\t2.- Ver reservas.");
             System.out.println("\t3.- Cerrar sesion");
-            System.out.println("\n\n\tSeleccione una opcion: ");
+            System.out.print("\n\n\tSeleccione una opcion: ");
 
-            opcion = Integer.parseInt(scan.nextLine());
+            opcion = scan.nextLine();
             switch (opcion){
-                case 1: //Buscar vuelos.
+                case "1": //Buscar vuelos.
                     buscarComprar();
                     break;
-                case 2: //Ver las reservas del cliente.
+                case "2": //Ver las reservas del cliente.
                     verReservasCliente();
                     break;
-                case 3: //Cerrar sesion.
-                    System.out.println("\n\n\tCerrando sesi�n... ");
+                case "3": //Cerrar sesion.
+                    System.out.println("\n\n\tSesion cerrada. ");
                     scan.close();
                     System.exit(0);
                     break;
@@ -307,13 +317,13 @@ public class Cliente {
 
     private static void buscarComprar(){
         System.out.println("\n\n\tBIENVENIDO A NUESTRO SISTEMA DE BUSQUEDA DE VUELOS NACIONALES\n\n");
-        System.out.println("Ciudad de origen: ");
+        System.out.print("\tCiudad de origen: ");
         String ciudadOrigen = scan.nextLine();
-        System.out.println("Ciudad de destino: ");
+        System.out.print("\n\tCiudad de destino: ");
         String ciudadDestino = scan.nextLine();
-        System.out.println("Fecha de salida[aaaa-mm-dd]: ");
+        System.out.print("\n\tFecha de salida[aaaa-mm-dd]: ");
         String fechaSalida = scan.nextLine();
-        System.out.println("Fecha de regreso[aaaa-mm-dd]: ");
+        System.out.print("\n\tFecha de regreso[aaaa-mm-dd]: ");
         String fechaRegreso = scan.nextLine();
 
         if(buscarOfertas(ciudadOrigen,ciudadDestino,fechaSalida,fechaRegreso)){
@@ -324,23 +334,23 @@ public class Cliente {
             System.out.println("\n\n\tDesea comprar algun vuelo?");
             System.out.println("\t1. Si.");
             System.out.println("\t2. No");
-            System.out.println("\n\n\tOpcion: ");
-            switch (Integer.parseInt(scan.nextLine())){
-                case 1:
-                    System.out.println("\n\n\tSeleccione la opcion que desea comprar:");
+            System.out.print("\n\n\tOpcion: ");
+            switch (scan.nextLine()){
+                case "1":
+                    System.out.print("\n\n\tSeleccione la opcion que desea comprar: ");
                     int opcion = Integer.parseInt(scan.nextLine());
                     if (opcion > 0 && opcion <= mapaOfertas.size()){
-                        System.out.println("A seleccionado la opcion de compra: " + opcion);
-                        System.out.println("Se va a proceder a la compra...");
-                        System.out.println("\n\nIngrese su IBAN: ");
+                        System.out.println("\tHa seleccionado la opcion de compra: " + opcion);
+                        System.out.println("\tSe va a proceder a la compra...");
+                        System.out.print("\n\n\tIngrese su IBAN: ");
                         String iban = scan.nextLine();
-                        System.out.println("Ingrese su codigo de seguridad: ");
+                        System.out.print("\n\tIngrese su codigo de seguridad: ");
                         String token = scan.nextLine();
 
                         comprarBillete(opcion,iban,token);
-                    }else System.out.println("\n\n\tOpci�n no v�lida, volviendo al menu principal...");
+                    }else System.out.println("\n\n\tOpcion no valida, volviendo al menu principal...");
                     break;
-                case 2:
+                case "2":
                     System.out.println("\n\n\tVolviendo al menu principal...");
                     break;
                 default:
@@ -372,9 +382,14 @@ public class Cliente {
             serviceClient.setOptions(options);
 
             if(sp.browseService("Orquestador") != null){
-
-                OMElement response = serviceClient.sendReceive(
-                        createPayLoadObtenerOfertas(ciudadOrigen,ciudadDestino,fechaSalida,fechaRegreso));
+                OMElement response;
+                try{
+                     response = serviceClient.sendReceive(
+                            createPayLoadObtenerOfertas(ciudadOrigen,ciudadDestino,fechaSalida,fechaRegreso));
+                }catch (Exception e){
+                    System.out.println("\n\n\n\tError. El Servicio Web Aeropuertos no se encuentra disponible.");
+                    return false;
+                }
 
                 JSONObject object = new JSONObject(response.getFirstElement().getText());
 

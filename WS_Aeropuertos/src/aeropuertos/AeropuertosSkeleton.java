@@ -23,11 +23,7 @@ import org.json.XML;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
-import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -39,32 +35,17 @@ import java.util.TreeSet;
 @SuppressWarnings("Duplicates")
 @WebService
 public class AeropuertosSkeleton implements ServiceLifeCycle{
-    private static TreeSet<String> aeropuertosOrigen = new TreeSet<>();
-    private static TreeSet<String> aeropuertosDestino = new TreeSet<>();
     private static Publish sp = new Publish();
 
     public void startUp(ConfigurationContext context, AxisService service) {
         String servicio = "Aeropuertos";
-        String interfaceName = "en0";
-        String ip="";
-        NetworkInterface networkInterface;
-
+        String ip = "";
         try {
-            networkInterface = NetworkInterface.getByName(interfaceName);
-            Enumeration<InetAddress> inetAddress = networkInterface.getInetAddresses();
-            InetAddress currentAddress;
-            while (inetAddress.hasMoreElements()) {
-                currentAddress = inetAddress.nextElement();
-                if (currentAddress instanceof Inet4Address && !currentAddress.isLoopbackAddress()) {
-                    ip = currentAddress.toString();
-                    break;
-                }
-            }
-        } catch (SocketException e) {
-            System.out.println(e.getMessage());
+            ip = InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        String endpoint = "http:/"+ip+":8081/axis2/services/Aeropuertos";
+        String endpoint = "http://"+ip+":8081/axis2/services/Aeropuertos";
         sp.publish(servicio, endpoint);
     }
 
@@ -145,6 +126,9 @@ public class AeropuertosSkeleton implements ServiceLifeCycle{
      */
 
     private static String createJSONResponse(OMElement res, String ciudadOrigen, String ciudadDestino){
+        TreeSet<String> aeropuertosOrigen = new TreeSet<>();
+        TreeSet<String> aeropuertosDestino = new TreeSet<>();
+
         String json = XML.toJSONObject(res.getFirstElement().getText()).toString();
         JSONObject response = new JSONObject(json);
         JSONObject NewDataSet = response.getJSONObject("NewDataSet");

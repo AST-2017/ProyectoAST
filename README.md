@@ -1,2 +1,0 @@
-# ProyectoAST
-Proyecto de AST

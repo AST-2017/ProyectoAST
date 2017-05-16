@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file was auto-generated from WSDL -->
+<!-- by the Apache Axis2 version: 1.7.4  Built on : Oct 21, 2016 (10:47:34 BST) -->
+<serviceGroup>
+    <service name="Aeropuertos" class="aeropuertos.AeropuertosSkeleton">
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="aeropuertos.AeropuertosMessageReceiverInOut"/>
+        </messageReceivers>
+        <parameter name="ServiceClass">aeropuertos.AeropuertosSkeleton</parameter>
+        <parameter name="useOriginalwsdl">true</parameter>
+        <parameter name="modifyUserWSDLPortAddress">true</parameter>
+        <operation name="getInfoAeropuerto" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://Aeropuertos">
+            <actionMapping>urn:getInfoAeropuerto</actionMapping>
+            <outputActionMapping>urn:getInfoAeropuertoResponse</outputActionMapping>
+        </operation>
+    </service>
+</serviceGroup>

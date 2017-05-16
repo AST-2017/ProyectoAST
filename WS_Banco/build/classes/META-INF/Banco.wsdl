@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://ws.apache.org/axis2" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://ws.apache.org/axis2" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://ws.apache.org/axis2">
+            <xs:element name="pagar">
+                <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="importe" type="xs:int"/>
+                      <xs:element name="cuentaOrigen" type="xs:int"/>
+                      <xs:element name="cuentaDestino" type="xs:int"/>
+                      <xs:element minOccurs="0" name="destinatario" nillable="true" type="xs:string"/>
+                      <xs:element minOccurs="0" name="mensaje" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="pagarResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="pagarRequest">
+    <wsdl:part name="parameters" element="ns:pagar">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="pagarResponse">
+    <wsdl:part name="parameters" element="ns:pagarResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="BancoPortType">
+    <wsdl:operation name="pagar">
+      <wsdl:input message="ns:pagarRequest" wsaw:Action="urn:pagar">
+    </wsdl:input>
+      <wsdl:output message="ns:pagarResponse" wsaw:Action="urn:pagarResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BancoSoap11Binding" type="ns:BancoPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="pagar">
+      <soap:operation soapAction="urn:pagar" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="BancoSoap12Binding" type="ns:BancoPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="pagar">
+      <soap12:operation soapAction="urn:pagar" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="BancoHttpBinding" type="ns:BancoPortType">
+    <http:binding verb="POST"/>
+    <wsdl:operation name="pagar">
+      <http:operation location="pagar"/>
+      <wsdl:input>
+        <mime:content part="parameters" type="application/xml"/>
+      </wsdl:input>
+      <wsdl:output>
+        <mime:content part="parameters" type="application/xml"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Banco">
+    <wsdl:port name="BancoHttpSoap12Endpoint" binding="ns:BancoSoap12Binding">
+      <soap12:address location="http://localhost:8080/axis2/services/Banco"/>
+    </wsdl:port>
+    <wsdl:port name="BancoHttpEndpoint" binding="ns:BancoHttpBinding">
+      <http:address location="http://localhost:8080/axis2/services/Banco"/>
+    </wsdl:port>
+    <wsdl:port name="BancoHttpSoap11Endpoint" binding="ns:BancoSoap11Binding">
+      <soap:address location="http://localhost:8080/axis2/services/Banco"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

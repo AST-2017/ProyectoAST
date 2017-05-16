@@ -1,0 +1,7 @@
+<module name="moduloBanco" class="ModuloBanco">
+    <InFlow>
+        <handler name="InFlowLogHandler" class="HandlerBanco">
+            <order phase="bancoPhase"/>
+        </handler>
+    </InFlow>
+</module>

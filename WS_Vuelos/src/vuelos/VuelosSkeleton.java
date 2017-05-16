@@ -16,9 +16,10 @@ import javax.jws.WebService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 
 /**
  * VuelosSkeleton java skeleton for the axisService
@@ -48,33 +49,17 @@ import java.util.Enumeration;
 @SuppressWarnings("Duplicates")
 @WebService
 public class VuelosSkeleton implements ServiceLifeCycle{
-    private static ArrayList<Salidas> salidasArrayList = new ArrayList<>();
-    private static ArrayList<Regresos> regresosArrayList = new ArrayList<>();
-    private static ArrayList<SalidasRegresos> salidasRegresosArrayList = new ArrayList<>();
     private static Publish sp = new Publish();
 
     public void startUp(ConfigurationContext context, AxisService service) {
         String servicio = "Vuelos";
-        String interfaceName = "en0";
-        String ip="";
-        NetworkInterface networkInterface;
-
+        String ip = "";
         try {
-            networkInterface = NetworkInterface.getByName(interfaceName);
-            Enumeration<InetAddress> inetAddress = networkInterface.getInetAddresses();
-            InetAddress currentAddress;
-            while (inetAddress.hasMoreElements()) {
-                currentAddress = inetAddress.nextElement();
-                if (currentAddress instanceof Inet4Address && !currentAddress.isLoopbackAddress()) {
-                    ip = currentAddress.toString();
-                    break;
-                }
-            }
-        } catch (SocketException e) {
-            System.out.println(e.getMessage());
+            ip = InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        String endpoint = "http:/"+ip+":8081/axis2/services/Vuelos";
+        String endpoint = "http://"+ip+":8081/axis2/services/Vuelos";
         sp.publish(servicio, endpoint);
     }
 
@@ -92,6 +77,10 @@ public class VuelosSkeleton implements ServiceLifeCycle{
      */
     @WebMethod
     public vuelos.GetInfoVuelosResponse getInfoVuelos(vuelos.GetInfoVuelos getInfoVuelos) throws IOException, JSONException {
+        ArrayList<Salidas> salidasArrayList = new ArrayList<>();
+        ArrayList<Regresos> regresosArrayList = new ArrayList<>();
+        ArrayList<SalidasRegresos> salidasRegresosArrayList = new ArrayList<>();
+
         GetInfoVuelosResponse getInfoVuelosResponse = new GetInfoVuelosResponse();
         String originAirport = getInfoVuelos.getOriginAirport();
         String destinationAirport = getInfoVuelos.getDestinationAirport();
@@ -103,7 +92,7 @@ public class VuelosSkeleton implements ServiceLifeCycle{
 
         JSONObject object = new JSONObject(responseSkyScanner);
         if (object.has("ValidationErrors")) responseClient = responseSkyScanner;
-        else responseClient = creteJSON(responseSkyScanner);
+        else responseClient = creteJSON(responseSkyScanner,salidasArrayList,regresosArrayList,salidasRegresosArrayList);
 
         getInfoVuelosResponse.setVuelos(responseClient);
 
@@ -123,6 +112,7 @@ public class VuelosSkeleton implements ServiceLifeCycle{
      */
     private static String getResponseSkyScanner(String originAirport, String destinationAirport, String outboundDate,
                                                String inboundDate){
+
         Logger.getRootLogger().setLevel(Level.OFF);
         String response = "";
         String aux;
@@ -207,18 +197,20 @@ public class VuelosSkeleton implements ServiceLifeCycle{
      * "Ofertas" con los atributos correspondientes a la clase SalidasRegresos.java
      */
 
-    private static String creteJSON(String responseSkyScanner) throws JSONException, IOException {
+    private static String creteJSON(String responseSkyScanner, ArrayList<Salidas> salidasArrayList,
+                                    ArrayList<Regresos> regresosArrayList,
+                                    ArrayList<SalidasRegresos> salidasRegresosArrayList) throws JSONException, IOException {
         JSONObject object = new JSONObject(responseSkyScanner);
         JSONArray array = object.getJSONArray("Quotes");
         for (int i = 0; i < array.length(); i++) {
             JSONObject object1 = array.getJSONObject(i);
             if (object1.has("OutboundLeg") && object1.has("InboundLeg")) {
-                salidasRegresos(object, object1);
+                salidasRegresos(object, object1,salidasRegresosArrayList);
             } else {
                 if (object1.has("OutboundLeg")) {
-                    salidas(object, object1);
+                    salidas(object, object1,salidasArrayList);
                 } else {
-                    regresos(object, object1);
+                    regresos(object, object1,regresosArrayList);
                 }
             }
         }
@@ -283,7 +275,7 @@ public class VuelosSkeleton implements ServiceLifeCycle{
      * @param quote  la parte de presupuestos de la respuesta JSON
      */
 
-    private static void salidas(JSONObject object, JSONObject quote) throws JSONException {
+    private static void salidas(JSONObject object, JSONObject quote, ArrayList<Salidas> salidasArrayList) throws JSONException {
         int precio = quote.getInt("MinPrice");
         boolean directo = quote.getBoolean("Direct");
 
@@ -321,7 +313,7 @@ public class VuelosSkeleton implements ServiceLifeCycle{
      * @param quote  la parte de presupuestos de la respuesta JSON
      */
 
-    private static void regresos(JSONObject object, JSONObject quote) throws JSONException {
+    private static void regresos(JSONObject object, JSONObject quote, ArrayList<Regresos> regresosArrayList) throws JSONException {
         int precio = quote.getInt("MinPrice");
         boolean directo = quote.getBoolean("Direct");
 
@@ -359,7 +351,7 @@ public class VuelosSkeleton implements ServiceLifeCycle{
      * @param quote  la parte de presupuestos de la respuesta JSON
      */
 
-    private static void salidasRegresos(JSONObject object, JSONObject quote) throws JSONException {
+    private static void salidasRegresos(JSONObject object, JSONObject quote, ArrayList<SalidasRegresos> salidasRegresosArrayList) throws JSONException {
         int precio = quote.getInt("MinPrice");
         boolean directo = quote.getBoolean("Direct");
 

@@ -281,8 +281,15 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
             header.setText(token+"-"+iban);
             servicioVuelos.addHeader(header);
 
-            OMElement response = servicioVuelos.sendReceive(
-                    createPayLoadBanco(String.valueOf(importe),iban,cuentaDestino,email,id_oferta,dni));
+            OMElement response;
+            try {
+                 response = servicioVuelos.sendReceive(
+                        createPayLoadBanco(String.valueOf(importe),iban,cuentaDestino,email,id_oferta,dni));
+            }catch (AxisFault e){
+                comprarBilleteResponse.setConfirmacion(
+                        tratamientoErrores("Disculpe las molestias, no se ha podido realizar el pago de su reserva codigo de seguridad o iban incorrectos."));
+                return comprarBilleteResponse;
+            }
 
             // Si el pago se realizo correctamente
             if(Boolean.valueOf(response.getFirstElement().getText())){
@@ -496,8 +503,15 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
                 opciones.setTo(new EndpointReference(endpointVuelos));
                 opciones.setAction("urn:getInfoVuelos");
                 servicioVuelos.setOptions(opciones);
-                OMElement response = servicioVuelos.sendReceive(
-                        createPayLoadVuelos(iataOrigenBBDD, iataDestinoBBDD, fechaSalida, fechaRegreso));
+                OMElement response;
+                try {
+                     response = servicioVuelos.sendReceive(
+                            createPayLoadVuelos(iataOrigenBBDD, iataDestinoBBDD, fechaSalida, fechaRegreso));
+                }catch (AxisFault e){
+                    obtenerOfertasResponse.setOfertas(
+                            tratamientoErrores("Error. El Servicio Web Vuelos no se encuentra disponible."));
+                    return obtenerOfertasResponse;
+                }
 
                 obtenerOfertasResponse.setOfertas(response.getFirstElement().getText());
                 insertarOfertas(response.getFirstElement().getText(),dni);
@@ -538,11 +552,18 @@ public class OrquestadorSkeleton implements ServiceLifeCycle{
                         opciones.setAction("urn:getInfoVuelos");
                         servicioVuelos.setOptions(opciones);
 
-                        response = servicioVuelos.sendReceive(
-                                createPayLoadVuelos(iataOrigenCallBack, iataDestinoCallBack, fechaSalida, fechaRegreso));
+                        OMElement resp;
+                        try {
+                            resp = servicioVuelos.sendReceive(
+                                    createPayLoadVuelos(iataOrigenBBDD, iataDestinoBBDD, fechaSalida, fechaRegreso));
+                        }catch (AxisFault e){
+                            obtenerOfertasResponse.setOfertas(
+                                    tratamientoErrores("Error. El Servicio Web Vuelos no se encuentra disponible."));
+                            return obtenerOfertasResponse;
+                        }
 
-                        obtenerOfertasResponse.setOfertas(response.getFirstElement().getText());
-                        insertarOfertas(response.getFirstElement().getText(),dni);
+                        obtenerOfertasResponse.setOfertas(resp.getFirstElement().getText());
+                        insertarOfertas(resp.getFirstElement().getText(),dni);
                     }
                 }
                 break;

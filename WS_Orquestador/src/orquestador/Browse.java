@@ -71,6 +71,7 @@ public class Browse {
 	public String browseService(String service) {
 
 		ServiceName = service;
+		endpoint = null;
 
 		try {
 

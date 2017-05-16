@@ -1,15 +1,20 @@
 package org.apache.ws.axis2;
 
-import org.apache.juddi.api_v3.AccessPointType;
+// CHANGE PACKAGE AND PATH TO uddi.xml
+
+import java.util.List;
+import java.io.File;
+
+import org.uddi.api_v3.*;
+import org.uddi.v3_service.UDDIInquiryPortType;
+import org.uddi.v3_service.UDDISecurityPortType;
+import org.apache.juddi.api_v3.*;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.juddi.v3.client.UDDIConstants;
 import org.apache.juddi.v3.client.config.UDDIClerk;
 import org.apache.juddi.v3.client.config.UDDIClient;
 import org.apache.juddi.v3.client.transport.Transport;
-import org.uddi.api_v3.*;
-import org.uddi.v3_service.UDDIInquiryPortType;
-import org.uddi.v3_service.UDDISecurityPortType;
-
-import java.util.List;
 
 public class Publish {
 
@@ -26,10 +31,12 @@ public class Publish {
 
 	public Publish() {
 
+		Logger.getRootLogger().setLevel(Level.OFF);
+
 		try {
 
 			// Create a client and read config file (uddi.xml)
-			UDDIClient uddiClient = new UDDIClient("/Users/ruben/Tomcat/uddi/uddi.xml");
+			UDDIClient uddiClient = new UDDIClient("C:/Users/Sara/Desktop/uddi.xml");
 
 			// The transport can be WS, inVM, RMI etc which is defined in the uddi.xml
 			Transport transport = uddiClient.getTransport("default");
@@ -56,7 +63,12 @@ public class Publish {
 
 		try {
 
-			if(!businessExists()) {
+			int comp = businessExists(servicio);
+			// if comp==1 means that neither the business nor the service exists.
+			// if comp==2 means that the businees exists but the service doesn't exist
+			// if comp==3 means that both the business and the service exist.
+
+			if(comp==1) {
 
 				/**
 				 * BUSINESS ENTIRY:
@@ -65,7 +77,7 @@ public class Publish {
 				 * industry categories, business identifiers, and a list of services provided.
 				 */
 
-				System.out.println("\n\nproyecto_C_AST does not exists as a business -> Creating it\n\n");
+				// System.out.println("\n\nproyecto_C_AST does not exists as a business -> Creating it\n\n");
 
 				// Creating the parent business entity that will contain our service
 				BusinessEntity myBusEntity = new BusinessEntity();
@@ -85,7 +97,9 @@ public class Publish {
 
 			}
 
-			System.out.println("\n\nmyBusiness key:  " + Buskey + "\n\n");
+			// System.out.println("\n\nmyBusiness key:  " + Buskey + "\n\n");
+
+			if(comp==1 || comp==2) {
 
 			/**
 			 * BUSINESS SERVICE
@@ -148,9 +162,12 @@ public class Publish {
 			}
 
 			Servkey = svc.getServiceKey();
-			System.out.println("\n\nmyService key:  " + Servkey + "\n\n");
 
-			clerk.discardAuthToken();
+		}
+
+		// System.out.println("\n\nmyService key:  " + Servkey + "\n\n");
+
+		clerk.discardAuthToken();
 
 		} catch (Exception e) {
 			System.out.println("Exception: " + e.toString());
@@ -163,15 +180,15 @@ public class Publish {
 
 	/*-------------------------------- METODO BUSINESS EXISTS --------------------------------*/
 
-	public boolean businessExists() {
+	public int businessExists(String servicio) {
 
-		boolean comp = false;
+		int comp = 0;
 
 		try {
 
 			String token = GetAuthKey("uddi", "uddi");
 			BusinessList findBusiness = GetBusinessList(token);
-			comp = PrintBusinessInfo(findBusiness.getBusinessInfos());
+			comp = PrintBusinessInfo(findBusiness.getBusinessInfos(), servicio);
 
 			security.discardAuthToken(new DiscardAuthToken(token));
 
@@ -194,7 +211,7 @@ public class Publish {
 
 			// Making API call that retrieves the authentication token for the user.
 			AuthToken rootAuthToken = security.getAuthToken(getAuthTokenRoot);
-			System.out.println(username + " AUTHTOKEN = (don't log auth tokens!");
+			// System.out.println(username + " AUTHTOKEN = (don't log auth tokens!");
 
 			return rootAuthToken.getAuthInfo();
 
@@ -224,11 +241,13 @@ public class Publish {
 	}
 
 
-	// Information about he business
-	private boolean PrintBusinessInfo(BusinessInfos businessInfos) {
+	// Look for the business and the service
+	private int PrintBusinessInfo(BusinessInfos businessInfos, String servicio) {
+
+		ServiceInfos serviceInfos;
 
 		if (businessInfos == null) {
-			System.out.println("No data returned");
+			// System.out.println("No data returned");
 		}
 
 		else {
@@ -240,14 +259,32 @@ public class Publish {
 
 					if((name.get(j).getValue()).equals("proyecto_C_AST")) {
 						Buskey = businessInfos.getBusinessInfo().get(i).getBusinessKey();
-						System.out.println("\n\nproyecto_C_AST already exists as a business\n\n");
-						return true;
+						// System.out.println("\n\nproyecto_C_AST already exists as a business\n\n");
+
+						if(businessInfos.getBusinessInfo().get(i).getServiceInfos() == null) {
+							// System.out.println("No services found.");
+							return 2;
+						}
+						else {
+							serviceInfos = businessInfos.getBusinessInfo().get(i).getServiceInfos();
+							for (int k = 0; k < serviceInfos.getServiceInfo().size(); k++) {
+								List<Name> name2 = serviceInfos.getServiceInfo().get(k).getName();
+								for (int l = 0; l < name2.size(); l++) {
+									if((name2.get(l).getValue()).equals(servicio)) {
+										Servkey = serviceInfos.getServiceInfo().get(k).getServiceKey();
+										// System.out.println("\n\nService "+servicio+" already exists.\n\n");
+										return 3;
+									}
+								}
+							}
+							return 2;
+						}
 					}
 				}
 			}
 		}
 
-		return false;
+		return 1;
 	}
 
 
@@ -259,7 +296,7 @@ public class Publish {
 		try {
 
 			// Create a client and read config file (uddi.xml)
-			UDDIClient uddiClient = new UDDIClient("/Users/ruben/Tomcat/uddi/uddi.xml");
+			UDDIClient uddiClient = new UDDIClient("C:/Users/Sara/Desktop/uddi.xml");
 
 			clerk = uddiClient.getClerk("default");
 

@@ -1,10 +1,14 @@
 package orquestador;
 
+// CHANGE PACKAGE AND PATH TO uddi.xml
+
 import org.apache.juddi.api_v3.AccessPointType;
 import org.apache.juddi.v3.client.UDDIConstants;
 import org.apache.juddi.v3.client.config.UDDIClerk;
 import org.apache.juddi.v3.client.config.UDDIClient;
 import org.apache.juddi.v3.client.transport.Transport;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.uddi.api_v3.*;
 import org.uddi.v3_service.UDDIInquiryPortType;
 import org.uddi.v3_service.UDDISecurityPortType;
@@ -25,6 +29,8 @@ public class Publish {
 	/*-------------------------------- CONSTRUCTOR --------------------------------*/
 
 	public Publish() {
+
+		Logger.getRootLogger().setLevel(Level.OFF);
 
 		try {
 
@@ -56,7 +62,12 @@ public class Publish {
 
 		try {
 
-			if(!businessExists()) {
+			int comp = businessExists(servicio);
+			// if comp==1 means that neither the business nor the service exists.
+			// if comp==2 means that the businees exists but the service doesn't exist
+			// if comp==3 means that both the business and the service exist.
+
+			if(comp==1) {
 
 				/**
 				 * BUSINESS ENTIRY:
@@ -65,7 +76,7 @@ public class Publish {
 				 * industry categories, business identifiers, and a list of services provided.
 				 */
 
-				System.out.println("\n\nproyecto_C_AST does not exists as a business -> Creating it\n\n");
+				// System.out.println("\n\nproyecto_C_AST does not exists as a business -> Creating it\n\n");
 
 				// Creating the parent business entity that will contain our service
 				BusinessEntity myBusEntity = new BusinessEntity();
@@ -85,70 +96,75 @@ public class Publish {
 
 			}
 
-			System.out.println("\n\nmyBusiness key:  " + Buskey + "\n\n");
+			// System.out.println("\n\nmyBusiness key:  " + Buskey + "\n\n");
 
-			/**
-			 * BUSINESS SERVICE
-			 *
-			 * Represents an individual web service provided by the business entity.
-			 *
-			 * Its description includes information on how to bind to the web service, what type of web service it is,
-			 * 		and what taxonomical categories it belongs to.
-			 */
+			if(comp==1 || comp==2) {
 
-			// Creating a service to save.
-			// Only adding the minimum data: the parent business key retrieved from saving the business above and a single name.
-			BusinessService myService = new BusinessService();
-			myService.setBusinessKey(Buskey);
-			Name myServName = new Name();
-			myServName.setValue(servicio); // SERVICE NAME PROVIDED BY MAIN
-			myService.getName().add(myServName);
+				/**
+				 * BUSINESS SERVICE
+				 *
+				 * Represents an individual web service provided by the business entity.
+				 *
+				 * Its description includes information on how to bind to the web service, what type of web service it is,
+				 * 		and what taxonomical categories it belongs to.
+				 */
 
-			/**
-			 * BINDING TEMPLATES
-			 *
-			 * Technical descriptions of the web services represented by the business service structure.
-			 *
-			 * A single business service may have multiple binding templates.
-			 *
-			 * The binding template represents the actual implementation of the web service.
-			 */
+				// Creating a service to save.
+				// Only adding the minimum data: the parent business key retrieved from saving the business above and a single name.
+				BusinessService myService = new BusinessService();
+				myService.setBusinessKey(Buskey);
+				Name myServName = new Name();
+				myServName.setValue(servicio); // SERVICE NAME PROVIDED BY MAIN
+				myService.getName().add(myServName);
 
-			// Add binding templates, access point.
-			BindingTemplate myBindingTemplate = new BindingTemplate();
-			AccessPoint accessPoint = new AccessPoint();
-			accessPoint.setUseType(AccessPointType.END_POINT.toString());
-			accessPoint.setValue(endpoint); // ENDPOINT PROVIDED BY MAIN
-			myBindingTemplate.setAccessPoint(accessPoint);
-			BindingTemplates myBindingTemplates = new BindingTemplates();
+				/**
+				 * BINDING TEMPLATES
+				 *
+				 * Technical descriptions of the web services represented by the business service structure.
+				 *
+				 * A single business service may have multiple binding templates.
+				 *
+				 * The binding template represents the actual implementation of the web service.
+				 */
 
-			/**
-			 * tMODEL
-			 *
-			 * A way of describing the various business, service, and template structures stored within the UDDI registry.
-			 *
-			 * Any abstract concept can be registered within the UDDI as a tModel.
-			 *
-			 * For instance, if you define a new WSDL port type, you can define a tModel that represents that
-			 * 		port type within the UDDI. Then, you can specify that a given business service implements that
-			 * 		port type by associating the tModel with one of that business service's binding templates.
-			 */
+				// Add binding templates, access point.
+				BindingTemplate myBindingTemplate = new BindingTemplate();
+				AccessPoint accessPoint = new AccessPoint();
+				accessPoint.setUseType(AccessPointType.END_POINT.toString());
+				accessPoint.setValue(endpoint); // ENDPOINT PROVIDED BY MAIN
+				myBindingTemplate.setAccessPoint(accessPoint);
+				BindingTemplates myBindingTemplates = new BindingTemplates();
 
-			// Optional but recommended step, this annotations our binding with all the standard SOAP tModel instance infos
-			myBindingTemplate = UDDIClient.addSOAPtModels(myBindingTemplate);
-			myBindingTemplates.getBindingTemplate().add(myBindingTemplate);
-			myService.setBindingTemplates(myBindingTemplates);
+				/**
+				 * tMODEL
+				 *
+				 * A way of describing the various business, service, and template structures stored within the UDDI registry.
+				 *
+				 * Any abstract concept can be registered within the UDDI as a tModel.
+				 *
+				 * For instance, if you define a new WSDL port type, you can define a tModel that represents that
+				 * 		port type within the UDDI. Then, you can specify that a given business service implements that
+				 * 		port type by associating the tModel with one of that business service's binding templates.
+				 */
 
-			// Adding the service to the "save" structure, using our publisher's authentication info and saving away.
-			BusinessService svc = clerk.register(myService);
+				// Optional but recommended step, this annotations our binding with all the standard SOAP tModel instance infos
+				myBindingTemplate = UDDIClient.addSOAPtModels(myBindingTemplate);
+				myBindingTemplates.getBindingTemplate().add(myBindingTemplate);
+				myService.setBindingTemplates(myBindingTemplates);
 
-			if (svc == null) {
-				System.out.println("Save failed! - 2");
-				System.exit(1);
+				// Adding the service to the "save" structure, using our publisher's authentication info and saving away.
+				BusinessService svc = clerk.register(myService);
+
+				if (svc == null) {
+					System.out.println("Save failed! - 2");
+					System.exit(1);
+				}
+
+				Servkey = svc.getServiceKey();
+
 			}
 
-			Servkey = svc.getServiceKey();
-			System.out.println("\n\nmyService key:  " + Servkey + "\n\n");
+			// System.out.println("\n\nmyService key:  " + Servkey + "\n\n");
 
 			clerk.discardAuthToken();
 
@@ -163,21 +179,21 @@ public class Publish {
 
 	/*-------------------------------- METODO BUSINESS EXISTS --------------------------------*/
 
-	public boolean businessExists() {
+	public int businessExists(String servicio) {
 
-		boolean comp = false;
+		int comp = 0;
 
 		try {
 
 			String token = GetAuthKey("uddi", "uddi");
 			BusinessList findBusiness = GetBusinessList(token);
-			comp = PrintBusinessInfo(findBusiness.getBusinessInfos());
+			comp = PrintBusinessInfo(findBusiness.getBusinessInfos(), servicio);
 
 			security.discardAuthToken(new DiscardAuthToken(token));
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return comp;
 
@@ -194,7 +210,7 @@ public class Publish {
 
 			// Making API call that retrieves the authentication token for the user.
 			AuthToken rootAuthToken = security.getAuthToken(getAuthTokenRoot);
-			System.out.println(username + " AUTHTOKEN = (don't log auth tokens!");
+			// System.out.println(username + " AUTHTOKEN = (don't log auth tokens!");
 
 			return rootAuthToken.getAuthInfo();
 
@@ -224,11 +240,13 @@ public class Publish {
 	}
 
 
-	// Information about he business
-	private boolean PrintBusinessInfo(BusinessInfos businessInfos) {
+	// Look for the business and the service
+	private int PrintBusinessInfo(BusinessInfos businessInfos, String servicio) {
+
+		ServiceInfos serviceInfos;
 
 		if (businessInfos == null) {
-			System.out.println("No data returned");
+			// System.out.println("No data returned");
 		}
 
 		else {
@@ -240,14 +258,32 @@ public class Publish {
 
 					if((name.get(j).getValue()).equals("proyecto_C_AST")) {
 						Buskey = businessInfos.getBusinessInfo().get(i).getBusinessKey();
-						System.out.println("\n\nproyecto_C_AST already exists as a business\n\n");
-						return true;
+						// System.out.println("\n\nproyecto_C_AST already exists as a business\n\n");
+
+						if(businessInfos.getBusinessInfo().get(i).getServiceInfos() == null) {
+							// System.out.println("No services found.");
+							return 2;
+						}
+						else {
+							serviceInfos = businessInfos.getBusinessInfo().get(i).getServiceInfos();
+							for (int k = 0; k < serviceInfos.getServiceInfo().size(); k++) {
+								List<Name> name2 = serviceInfos.getServiceInfo().get(k).getName();
+								for (int l = 0; l < name2.size(); l++) {
+									if((name2.get(l).getValue()).equals(servicio)) {
+										Servkey = serviceInfos.getServiceInfo().get(k).getServiceKey();
+										// System.out.println("\n\nService "+servicio+" already exists.\n\n");
+										return 3;
+									}
+								}
+							}
+							return 2;
+						}
 					}
 				}
 			}
 		}
 
-		return false;
+		return 1;
 	}
 
 
